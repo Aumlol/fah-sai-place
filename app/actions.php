@@ -99,18 +99,94 @@ try {
         $roomId = trim((string) ($_POST['roomId'] ?? ''));
         $roomNumber = trim((string) ($_POST['roomNumber'] ?? ''));
         $status = trim((string) ($_POST['roomStatus'] ?? 'ว่าง'));
+        $tenantId = trim((string) ($_POST['tenantId'] ?? ''));
+        $startDate = trim((string) ($_POST['startDate'] ?? ''));
+        $deposit = filter_var($_POST['deposit'] ?? 0, FILTER_VALIDATE_FLOAT);
         $price = filter_var($_POST['rentalPrice'] ?? null, FILTER_VALIDATE_FLOAT);
+        $startDateValue = $startDate !== '' ? DateTime::createFromFormat('!Y-m-d', $startDate) : false;
+        $validStartDate = $startDateValue instanceof DateTime && $startDateValue->format('Y-m-d') === $startDate;
         if ($roomNumber === '' || $price === false || $price < 0 || !in_array($status, ['ว่าง', 'มีผู้เช่า', 'ปิดปรับปรุง'], true)) {
             throw new RuntimeException('กรุณาตรวจสอบข้อมูลห้องพัก');
         }
-
-        if ($roomId !== '') {
-            $statement = db()->prepare('UPDATE Room SET roomNumber = ?, roomStatus = ?, rentalPrice = ? WHERE roomId = ?');
-            $statement->execute([$roomNumber, $status, $price, $roomId]);
-        } else {
+        if ($roomId === '') {
             require_role(['Admin']);
-            $statement = db()->prepare('INSERT INTO Room (roomId, roomNumber, roomStatus, rentalPrice) VALUES (?, ?, ?, ?)');
-            $statement->execute([generate_id('ROOM-', 4), $roomNumber, $status, $price]);
+        }
+
+        $connection = db();
+        $connection->beginTransaction();
+        try {
+            $room = null;
+            $activeLease = null;
+            if ($roomId !== '') {
+                $roomStatement = $connection->prepare('SELECT roomId, roomStatus FROM Room WHERE roomId = ? FOR UPDATE');
+                $roomStatement->execute([$roomId]);
+                $room = $roomStatement->fetch();
+                if (!$room) {
+                    throw new RuntimeException('ไม่พบห้องพักที่ต้องการแก้ไข');
+                }
+
+                $leaseStatement = $connection->prepare("SELECT contractId, userId FROM Contract WHERE roomId = ? AND status = 'ใช้งานอยู่' FOR UPDATE");
+                $leaseStatement->execute([$roomId]);
+                $activeLease = $leaseStatement->fetch();
+                if ($activeLease && $status !== 'มีผู้เช่า') {
+                    throw new RuntimeException('ห้องนี้มีผู้เช่าอยู่ กรุณาสิ้นสุดสัญญาจากหน้าผู้เช่าและสัญญาก่อนเปลี่ยนสถานะ');
+                }
+                if ($activeLease && $tenantId !== '' && $tenantId !== $activeLease['userId']) {
+                    throw new RuntimeException('ห้องนี้มีผู้เช่าอยู่แล้ว กรุณาสิ้นสุดสัญญาเดิมก่อนเปลี่ยนผู้เช่า');
+                }
+            }
+
+            if ($status === 'มีผู้เช่า' && !$activeLease) {
+                if ($user['role'] !== 'Admin') {
+                    throw new RuntimeException('เฉพาะผู้ดูแลระบบเท่านั้นที่กำหนดผู้เช่าให้ห้องได้');
+                }
+                if ($tenantId === '' || !$validStartDate || $deposit === false || $deposit < 0) {
+                    throw new RuntimeException('การกำหนดห้องว่ามีผู้เช่าต้องเลือกผู้เช่า ระบุวันที่เริ่มสัญญา และเงินประกัน');
+                }
+
+                $tenantStatement = $connection->prepare("SELECT userId FROM `User` WHERE userId = ? AND role = 'Tenant' FOR UPDATE");
+                $tenantStatement->execute([$tenantId]);
+                if (!$tenantStatement->fetch()) {
+                    throw new RuntimeException('ไม่พบผู้เช่าที่เลือก');
+                }
+
+                $tenantLeaseStatement = $connection->prepare("SELECT contractId FROM Contract WHERE userId = ? AND status = 'ใช้งานอยู่' FOR UPDATE");
+                $tenantLeaseStatement->execute([$tenantId]);
+                if ($tenantLeaseStatement->fetch()) {
+                    throw new RuntimeException('ผู้เช่ารายนี้มีสัญญาที่ใช้งานอยู่แล้ว');
+                }
+
+                if ($room && $room['roomStatus'] === 'ปิดปรับปรุง') {
+                    throw new RuntimeException('กรุณาเปลี่ยนห้องจากสถานะปิดปรับปรุงก่อนกำหนดผู้เช่า');
+                }
+
+                if ($roomId === '') {
+                    $roomId = generate_id('ROOM-', 4);
+                    $roomInsert = $connection->prepare('INSERT INTO Room (roomId, roomNumber, roomStatus, rentalPrice) VALUES (?, ?, ?, ?)');
+                    $roomInsert->execute([$roomId, $roomNumber, $status, $price]);
+                } else {
+                    $roomUpdate = $connection->prepare('UPDATE Room SET roomNumber = ?, roomStatus = ?, rentalPrice = ? WHERE roomId = ?');
+                    $roomUpdate->execute([$roomNumber, $status, $price, $roomId]);
+                }
+
+                $contractId = generate_id('CON-' . date('Y') . '-', 3);
+                $contractInsert = $connection->prepare("INSERT INTO Contract (contractId, userId, roomId, startDate, deposit, status) VALUES (?, ?, ?, ?, ?, 'ใช้งานอยู่')");
+                $contractInsert->execute([$contractId, $tenantId, $roomId, $startDate, $deposit]);
+            } elseif ($roomId !== '') {
+                $roomUpdate = $connection->prepare('UPDATE Room SET roomNumber = ?, roomStatus = ?, rentalPrice = ? WHERE roomId = ?');
+                $roomUpdate->execute([$roomNumber, $status, $price, $roomId]);
+            } else {
+                $roomId = generate_id('ROOM-', 4);
+                $roomInsert = $connection->prepare('INSERT INTO Room (roomId, roomNumber, roomStatus, rentalPrice) VALUES (?, ?, ?, ?)');
+                $roomInsert->execute([$roomId, $roomNumber, $status, $price]);
+            }
+
+            $connection->commit();
+        } catch (Throwable $exception) {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
+            throw $exception;
         }
         flash('บันทึกข้อมูลห้องพักแล้ว');
         redirect('rooms');
@@ -309,13 +385,14 @@ try {
 
     if ($action === 'generate_invoices') {
         require_role(['Admin']);
-        $billMonth = trim((string) ($_POST['billMonth'] ?? ''));
+        $billMonth = normalize_billing_month((string) ($_POST['billMonth'] ?? ''));
         $contractId = trim((string) ($_POST['contractId'] ?? ''));
         $dueDate = trim((string) ($_POST['dueDate'] ?? ''));
         $dueDateValue = DateTime::createFromFormat('!Y-m-d', $dueDate);
-        if ($contractId === '' || $billMonth === '' || mb_strlen($billMonth, 'UTF-8') > 20 || !$dueDateValue || $dueDateValue->format('Y-m-d') !== $dueDate) {
+        if ($contractId === '' || $billMonth === null || !$dueDateValue || $dueDateValue->format('Y-m-d') !== $dueDate) {
             throw new RuntimeException('กรุณาเลือกห้อง ระบุเดือน และวันครบกำหนดชำระให้ถูกต้อง');
         }
+        $billMonthVariants = billing_month_variants($billMonth);
 
         $connection = db();
         $connection->beginTransaction();
@@ -333,15 +410,28 @@ try {
                 throw new RuntimeException('ไม่พบสัญญาเช่าที่กำลังใช้งานของห้องที่เลือก');
             }
 
-            $meterStatement = $connection->prepare('SELECT waterUnit, electricUnit FROM MeterRecord WHERE roomId = ? AND month = ?');
-            $meterStatement->execute([$contract['roomId'], $billMonth]);
-            $meter = $meterStatement->fetch();
+            $meterStatement = $connection->prepare(
+                'SELECT waterUnit, electricUnit FROM MeterRecord
+                 WHERE roomId = ? AND month IN (?, ?)
+                 ORDER BY (month = ?) DESC'
+            );
+            $meterStatement->execute([
+                $contract['roomId'],
+                $billMonthVariants[0],
+                $billMonthVariants[1],
+                $billMonthVariants[0],
+            ]);
+            $meterRecords = $meterStatement->fetchAll();
+            if (count($meterRecords) > 1) {
+                throw new RuntimeException("พบข้อมูลมิเตอร์ซ้ำสำหรับห้อง {$contract['roomNumber']} รอบบิล {$billMonth} กรุณาตรวจสอบข้อมูลก่อนออกใบแจ้งหนี้");
+            }
+            $meter = $meterRecords[0] ?? null;
             if (!$meter) {
                 throw new RuntimeException("ไม่พบข้อมูลมิเตอร์ของห้อง {$contract['roomNumber']} ในรอบบิล {$billMonth} กรุณาบันทึกมิเตอร์ก่อนสร้างใบแจ้งหนี้");
             }
 
-            $existingStatement = $connection->prepare('SELECT invoiceId FROM Invoice WHERE contractId = ? AND billMonth = ?');
-            $existingStatement->execute([$contract['contractId'], $billMonth]);
+            $existingStatement = $connection->prepare('SELECT invoiceId FROM Invoice WHERE contractId = ? AND billMonth IN (?, ?)');
+            $existingStatement->execute([$contract['contractId'], $billMonthVariants[0], $billMonthVariants[1]]);
             if ($existingStatement->fetch()) {
                 throw new RuntimeException("ห้อง {$contract['roomNumber']} มีใบแจ้งหนี้ของรอบบิล {$billMonth} แล้ว");
             }
@@ -396,15 +486,53 @@ try {
     if ($action === 'save_meter') {
         require_role(['Staff', 'Admin']);
         $roomId = (string) ($_POST['roomId'] ?? '');
-        $month = trim((string) ($_POST['month'] ?? ''));
+        $month = normalize_billing_month((string) ($_POST['month'] ?? ''));
         $water = filter_var($_POST['waterUnit'] ?? null, FILTER_VALIDATE_FLOAT);
         $electric = filter_var($_POST['electricUnit'] ?? null, FILTER_VALIDATE_FLOAT);
-        if ($roomId === '' || $month === '' || mb_strlen($month, 'UTF-8') > 20 || $water === false || $water < 0 || $electric === false || $electric < 0) {
-            throw new RuntimeException('กรุณาตรวจสอบห้อง เดือน และตัวเลขมิเตอร์');
+        if ($roomId === '' || $month === null || $water === false || $water < 0 || $electric === false || $electric < 0) {
+            throw new RuntimeException('กรุณาตรวจสอบห้อง เดือนรูปแบบ MM/YYYY และตัวเลขมิเตอร์');
         }
-        $meterId = generate_id('MTR-' . date('Y') . '-', 3);
-        $statement = db()->prepare('INSERT INTO MeterRecord (meterId, roomId, waterUnit, electricUnit, recordDate, month) VALUES (?, ?, ?, ?, ?, ?)');
-        $statement->execute([$meterId, $roomId, $water, $electric, date('Y-m-d'), $month]);
+        $monthVariants = billing_month_variants($month);
+        $connection = db();
+        $connection->beginTransaction();
+        try {
+            $roomStatement = $connection->prepare('SELECT roomId FROM Room WHERE roomId = ? FOR UPDATE');
+            $roomStatement->execute([$roomId]);
+            if (!$roomStatement->fetch()) {
+                throw new RuntimeException('ไม่พบห้องพักที่เลือก');
+            }
+
+            $duplicate = $connection->prepare('SELECT meterId FROM MeterRecord WHERE roomId = ? AND month IN (?, ?)');
+            $duplicate->execute([$roomId, $monthVariants[0], $monthVariants[1]]);
+            if ($duplicate->fetch()) {
+                throw new RuntimeException('ห้องนี้มีข้อมูลมิเตอร์ของเดือนดังกล่าวแล้ว และไม่สามารถแก้ไขรายการที่บันทึกแล้ว');
+            }
+
+            $records = $connection->prepare('SELECT month FROM MeterRecord WHERE roomId = ? FOR UPDATE');
+            $records->execute([$roomId]);
+            $latestMonth = null;
+            $latestMonthIndex = null;
+            foreach ($records->fetchAll() as $record) {
+                $monthIndex = billing_month_index((string) $record['month']);
+                if ($monthIndex !== null && ($latestMonthIndex === null || $monthIndex > $latestMonthIndex)) {
+                    $latestMonth = normalize_billing_month((string) $record['month']);
+                    $latestMonthIndex = $monthIndex;
+                }
+            }
+            if ($latestMonthIndex !== null && billing_month_index($month) <= $latestMonthIndex) {
+                throw new RuntimeException("มิเตอร์เดือนก่อนหน้า ({$latestMonth}) ถูกล็อกแล้ว กรุณาบันทึกรอบเดือนถัดไป");
+            }
+
+            $meterId = generate_id('MTR-' . date('Y') . '-', 3);
+            $statement = $connection->prepare('INSERT INTO MeterRecord (meterId, roomId, waterUnit, electricUnit, recordDate, month) VALUES (?, ?, ?, ?, ?, ?)');
+            $statement->execute([$meterId, $roomId, $water, $electric, date('Y-m-d'), $month]);
+            $connection->commit();
+        } catch (Throwable $exception) {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
+            throw $exception;
+        }
         flash('บันทึกข้อมูลมิเตอร์แล้ว');
         redirect('meters');
     }

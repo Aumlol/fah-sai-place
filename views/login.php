@@ -45,8 +45,8 @@ try {
           <input type="hidden" name="action" value="login">
           <label>ชื่อผู้ใช้<input name="username" autocomplete="username" required autofocus
               placeholder="กรอกชื่อผู้ใช้"></label>
-          <label>รหัสผ่าน<input type="password" name="password" autocomplete="current-password" required
-              placeholder="กรอกรหัสผ่าน"></label>
+          <label>รหัสผ่าน<span class="password-control"><input type="password" name="password" autocomplete="current-password" required
+              placeholder="กรอกรหัสผ่าน"><button class="password-toggle" type="button" data-toggle-password="password" aria-label="แสดงรหัสผ่าน">แสดง</button></span></label>
           <button class="button primary full" type="submit">เข้าสู่ระบบ <span aria-hidden="true">→</span></button>
         </form>
         <?php if (!$hasUsers): ?><a class="setup-link"
@@ -55,6 +55,7 @@ try {
       <footer>© <?= date('Y') ?> ฟ้าใสเพลส · ระบบบริหารจัดการหอพัก</footer>
     </section>
   </main>
+  <script src="assets/js/app.js" defer></script>
 </body>
 
 </html>

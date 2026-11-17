@@ -13,6 +13,55 @@ function money(float|int|string $amount): string
     return number_format((float) $amount, 2);
 }
 
+function normalize_billing_month(string $month): ?string
+{
+    if (!preg_match('/^(\d{1,2})\/(\d{4})$/D', trim($month), $matches)) {
+        return null;
+    }
+
+    $monthNumber = (int) $matches[1];
+    $year = (int) $matches[2];
+    if ($monthNumber < 1 || $monthNumber > 12) {
+        return null;
+    }
+
+    if ($year >= 1900 && $year <= 2156) {
+        $year += 543;
+    }
+    if ($year < 2400 || $year > 2800) {
+        return null;
+    }
+
+    return sprintf('%02d/%04d', $monthNumber, $year);
+}
+
+function billing_month_index(string $month): ?int
+{
+    $normalized = normalize_billing_month($month);
+    if ($normalized === null) {
+        return null;
+    }
+
+    [$monthNumber, $year] = array_map('intval', explode('/', $normalized));
+
+    return ($year * 12) + $monthNumber;
+}
+
+function billing_month_variants(string $month): array
+{
+    $normalized = normalize_billing_month($month);
+    if ($normalized === null) {
+        return [];
+    }
+
+    [$monthNumber, $year] = array_map('intval', explode('/', $normalized));
+
+    return [
+        $normalized,
+        sprintf('%02d/%04d', $monthNumber, $year - 543),
+    ];
+}
+
 function generate_id(string $prefix, int $length = 4): string
 {
     $sources = [

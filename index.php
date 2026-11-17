@@ -28,26 +28,33 @@ if ($page === 'invoice_meter') {
     }
 
     $contractId = trim((string) ($_GET['contractId'] ?? ''));
-    $billMonth = trim((string) ($_GET['billMonth'] ?? ''));
-    if ($contractId === '' || $billMonth === '' || mb_strlen($billMonth, 'UTF-8') > 20) {
+    $billMonth = normalize_billing_month((string) ($_GET['billMonth'] ?? ''));
+    if ($contractId === '' || $billMonth === null) {
         http_response_code(400);
-        echo json_encode(['error' => 'กรุณาเลือกห้องและระบุรอบบิลให้ถูกต้อง'], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['error' => 'กรุณาเลือกห้องและระบุรอบบิลรูปแบบ MM/YYYY ให้ถูกต้อง'], JSON_UNESCAPED_UNICODE);
         exit;
     }
+    $billMonthVariants = billing_month_variants($billMonth);
 
     try {
         $statement = db()->prepare(
             "SELECT c.contractId, u.name, r.roomNumber, r.rentalPrice,
                     m.waterUnit, m.electricUnit,
-                    EXISTS(SELECT 1 FROM Invoice i WHERE i.contractId = c.contractId AND i.billMonth = ?) AS invoiceExists
+                    EXISTS(SELECT 1 FROM Invoice i WHERE i.contractId = c.contractId AND i.billMonth IN (?, ?)) AS invoiceExists
              FROM Contract c
              JOIN `User` u ON u.userId = c.userId
              JOIN Room r ON r.roomId = c.roomId
-             LEFT JOIN MeterRecord m ON m.roomId = c.roomId AND m.month = ?
+             LEFT JOIN MeterRecord m ON m.roomId = c.roomId AND m.month IN (?, ?)
              WHERE c.contractId = ? AND c.status = 'ใช้งานอยู่'
              LIMIT 1"
         );
-        $statement->execute([$billMonth, $billMonth, $contractId]);
+        $statement->execute([
+            $billMonthVariants[0],
+            $billMonthVariants[1],
+            $billMonthVariants[0],
+            $billMonthVariants[1],
+            $contractId,
+        ]);
         $invoice = $statement->fetch();
     } catch (PDOException $exception) {
         $reference = log_database_exception($exception);

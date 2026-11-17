@@ -63,6 +63,34 @@ function resetPasswordVisibility(form) {
   });
 }
 
+function updateRoomAssignmentForm(modal) {
+  const form = modal.querySelector('form');
+  const status = form.querySelector('[data-room-status]');
+  const assignmentFields = form.querySelector('[data-room-assignment-fields]');
+  const tenant = form.querySelector('[data-room-tenant]');
+  const startDate = form.querySelector('[data-room-start]');
+  const deposit = form.querySelector('[data-room-deposit]');
+  const note = form.querySelector('[data-room-assignment-note]');
+  const roomId = form.querySelector('[name="roomId"]').value;
+  const currentTenantId = form.dataset.currentTenant || '';
+  const isOccupied = status.value === 'มีผู้เช่า';
+  const hasCurrentLease = currentTenantId !== '' && tenant.value === currentTenantId;
+  const needsNewLease = isOccupied && !hasCurrentLease;
+
+  assignmentFields.hidden = !isOccupied;
+  tenant.required = isOccupied;
+  startDate.required = needsNewLease;
+  deposit.required = needsNewLease;
+  note.textContent = hasCurrentLease
+    ? 'ห้องนี้เชื่อมกับผู้เช่าปัจจุบันแล้ว หากต้องการเปลี่ยนผู้เช่าให้สิ้นสุดสัญญาเดิมก่อน'
+    : 'เลือกผู้เช่าที่ยังไม่มีสัญญาใช้งานอยู่ และระบุวันที่เริ่มสัญญา';
+
+  Array.from(tenant.options).forEach(option => {
+    const activeRoomId = option.dataset.activeRoom || '';
+    option.disabled = activeRoomId !== '' && activeRoomId !== roomId;
+  });
+}
+
 document.addEventListener('click', event => {
   const openButton = event.target.closest('[data-modal-open]');
   if (openButton) {
@@ -71,6 +99,8 @@ document.addEventListener('click', event => {
       const form = modal.querySelector('form');
       form.reset();
       form.querySelector('[name="roomId"]').value = '';
+      form.dataset.currentTenant = '';
+      updateRoomAssignmentForm(modal);
     }
     if (modal && openButton.dataset.modalOpen === 'user-modal' && !openButton.dataset.editAccount) {
       const form = modal.querySelector('form');
@@ -147,10 +177,16 @@ document.addEventListener('click', event => {
   if (editButton) {
     const modal = document.getElementById('room-modal');
     const room = JSON.parse(editButton.dataset.room);
-    modal.querySelector('[name="roomId"]').value = room.roomId;
-    modal.querySelector('[name="roomNumber"]').value = room.roomNumber;
-    modal.querySelector('[name="roomStatus"]').value = room.roomStatus;
-    modal.querySelector('[name="rentalPrice"]').value = room.rentalPrice;
+    const form = modal.querySelector('form');
+    form.querySelector('[name="roomId"]').value = room.roomId;
+    form.querySelector('[name="roomNumber"]').value = room.roomNumber;
+    form.querySelector('[name="roomStatus"]').value = room.roomStatus;
+    form.querySelector('[name="rentalPrice"]').value = room.rentalPrice;
+    form.dataset.currentTenant = room.activeTenantId || '';
+    form.querySelector('[name="tenantId"]').value = room.activeTenantId || '';
+    form.querySelector('[name="startDate"]').value = room.activeStartDate || '';
+    form.querySelector('[name="deposit"]').value = room.activeDeposit ?? '0';
+    updateRoomAssignmentForm(modal);
     modal.showModal();
   }
 
@@ -204,6 +240,16 @@ if (accountForm) {
   accountForm.addEventListener('submit', () => updateAccountPassword(accountModal));
 }
 
+const roomModal = document.getElementById('room-modal');
+if (roomModal) {
+  roomModal.querySelector('[data-room-status]').addEventListener('change', () => {
+    updateRoomAssignmentForm(roomModal);
+  });
+  roomModal.querySelector('[data-room-tenant]').addEventListener('change', () => {
+    updateRoomAssignmentForm(roomModal);
+  });
+}
+
 document.querySelectorAll('dialog').forEach(modal => {
   modal.addEventListener('click', event => {
     if (event.target === modal) modal.close();
@@ -233,6 +279,24 @@ document.querySelectorAll('[data-table-search]').forEach(input => {
     });
   });
 });
+
+const meterForm = document.querySelector('[data-meter-form]');
+if (meterForm) {
+  const roomSelect = meterForm.querySelector('[data-meter-room]');
+  const previousMeter = document.querySelector('[data-previous-meter]');
+  const updatePreviousMeter = () => {
+    const option = roomSelect.selectedOptions[0];
+    if (!roomSelect.value) {
+      previousMeter.textContent = 'เลือกห้องเพื่อดูบันทึกมิเตอร์ครั้งก่อน';
+    } else if (!option.dataset.lastMonth) {
+      previousMeter.textContent = 'ห้องนี้ยังไม่มีบันทึกมิเตอร์ก่อนหน้า';
+    } else {
+      previousMeter.textContent = `บันทึกครั้งก่อน เดือน ${option.dataset.lastMonth} (${option.dataset.lastDate}): น้ำ ${option.dataset.lastWater} หน่วย · ไฟฟ้า ${option.dataset.lastElectric} หน่วย`;
+    }
+  };
+  roomSelect.addEventListener('change', updatePreviousMeter);
+  updatePreviousMeter();
+}
 
 const invoiceForm = document.querySelector('[data-invoice-form]');
 if (invoiceForm) {
