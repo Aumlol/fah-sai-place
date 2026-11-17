@@ -1,0 +1,6 @@
+/uploads/*
+!/uploads/.htaccess
+
+.env
+.env.*
+!.env.example
