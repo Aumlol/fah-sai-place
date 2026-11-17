@@ -202,6 +202,7 @@ try {
         $email = trim((string) ($_POST['email'] ?? ''));
         $phone = preg_replace('/\D+/', '', (string) ($_POST['phone'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
+<<<<<<< HEAD
         $passwordConfirmation = (string) ($_POST['password_confirm'] ?? '');
         $role = (string) ($_POST['role'] ?? '');
         if ($targetUserId === '' || $password !== '') {
@@ -221,6 +222,11 @@ try {
         }
         if ($name === '' || $username === '' || mb_strlen($username, 'UTF-8') > 50 || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($phone) !== 10 || !in_array($role, ['Tenant', 'Staff', 'Admin', 'Technician'], true)) {
             throw new RuntimeException('กรุณาตรวจสอบข้อมูลบัญชีผู้ใช้งาน');
+=======
+        $role = (string) ($_POST['role'] ?? '');
+        if ($name === '' || $username === '' || mb_strlen($username, 'UTF-8') > 50 || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($phone) !== 10 || ($targetUserId === '' && strlen($password) < 10) || ($password !== '' && strlen($password) < 10) || !in_array($role, ['Tenant', 'Staff', 'Admin', 'Technician'], true)) {
+            throw new RuntimeException('กรุณาตรวจสอบข้อมูลบัญชีและใช้รหัสผ่านอย่างน้อย 10 ตัวอักษร');
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
         }
         if ($targetUserId !== '') {
             $existingUser = db()->prepare('SELECT userId FROM `User` WHERE userId = ?');
@@ -688,14 +694,22 @@ try {
     redirect((string) ($_POST['return_page'] ?? 'dashboard'));
 } catch (Throwable $exception) {
     if ($exception instanceof PDOException) {
+<<<<<<< HEAD
         $reference = log_database_exception($exception);
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
         $sqlState = (string) ($exception->errorInfo[0] ?? $exception->getCode());
         $message = match ($sqlState) {
             '23000' => 'ข้อมูลซ้ำกับรายการที่มีอยู่แล้ว กรุณาตรวจสอบชื่อผู้ใช้ อีเมล หรือข้อมูลที่เกี่ยวข้อง',
             '42S22', '42S02' => 'โครงสร้างฐานข้อมูลยังไม่อัปเดต กรุณารันคำสั่ง migration ที่ระบุใน README.md แล้วลองใหม่',
+<<<<<<< HEAD
             default => 'บันทึกหรือเข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบค่า DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD และสิทธิ์ฐานข้อมูล',
         };
         $message .= ' (รหัสตรวจสอบ: ' . $reference . ')';
+=======
+            default => 'บันทึกหรือเข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบว่า MySQL ทำงานอยู่และฐานข้อมูล fasai_place พร้อมใช้งาน',
+        };
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
         flash($message, 'error');
     } else {
         flash($exception->getMessage(), 'error');

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 function updateAccountPassword(modal) {
   const form = modal.querySelector('form');
   const password = form.querySelector('[data-password]');
@@ -63,6 +64,8 @@ function resetPasswordVisibility(form) {
   });
 }
 
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
 document.addEventListener('click', event => {
   const openButton = event.target.closest('[data-modal-open]');
   if (openButton) {
@@ -75,14 +78,20 @@ document.addEventListener('click', event => {
     if (modal && openButton.dataset.modalOpen === 'user-modal' && !openButton.dataset.editAccount) {
       const form = modal.querySelector('form');
       form.reset();
+<<<<<<< HEAD
       resetPasswordVisibility(form);
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
       form.querySelector('[name="userId"]').value = '';
       modal.querySelector('h2').textContent = 'เพิ่มบัญชีผู้ใช้งาน';
       modal.querySelector('[type="submit"]').textContent = 'สร้างบัญชี';
       form.querySelector('[name="password"]').required = true;
+<<<<<<< HEAD
       form.querySelector('[name="password_confirm"]').required = true;
       modal.querySelector('[data-password-note]').textContent = 'รหัสผ่านใหม่ต้องผ่านเงื่อนไขครบทุกข้อ';
       updateAccountPassword(modal);
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
     }
     if (modal && openButton.dataset.modalOpen === 'news-modal') {
       const form = modal.querySelector('form');
@@ -128,6 +137,7 @@ document.addEventListener('click', event => {
   const closeButton = event.target.closest('[data-modal-close]');
   if (closeButton) closeButton.closest('dialog')?.close();
 
+<<<<<<< HEAD
   const passwordToggle = event.target.closest('[data-toggle-password]');
   if (passwordToggle) {
     const input = passwordToggle.closest('.password-control').querySelector('input');
@@ -137,6 +147,8 @@ document.addEventListener('click', event => {
     passwordToggle.setAttribute('aria-label', visible ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน');
   }
 
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
   const dismissButton = event.target.closest('[data-dismiss]');
   if (dismissButton) dismissButton.closest('.alert')?.remove();
 
@@ -172,18 +184,24 @@ document.addEventListener('click', event => {
     const modal = document.getElementById('user-modal');
     const account = JSON.parse(editAccountButton.dataset.account);
     const form = modal.querySelector('form');
+<<<<<<< HEAD
     form.reset();
     resetPasswordVisibility(form);
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
     for (const [field, value] of Object.entries(account)) {
       const input = form.querySelector(`[name="${field}"]`);
       if (input) input.value = value;
     }
     form.querySelector('[name="password"]').value = '';
     form.querySelector('[name="password"]').required = false;
+<<<<<<< HEAD
     form.querySelector('[name="password_confirm"]').value = '';
     form.querySelector('[name="password_confirm"]').required = false;
     modal.querySelector('[data-password-note]').textContent = 'เว้นว่างทั้งสองช่องหากไม่ต้องการเปลี่ยนรหัสผ่าน';
     updateAccountPassword(modal);
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
     modal.querySelector('h2').textContent = 'แก้ไขบัญชีผู้ใช้งาน';
     modal.querySelector('[type="submit"]').textContent = 'บันทึกการแก้ไข';
     modal.showModal();
@@ -193,6 +211,7 @@ document.addEventListener('click', event => {
   if (confirmButton && !window.confirm(confirmButton.dataset.confirm)) event.preventDefault();
 });
 
+<<<<<<< HEAD
 const accountForm = document.querySelector('#user-modal form');
 if (accountForm) {
   const accountModal = document.getElementById('user-modal');
@@ -204,6 +223,8 @@ if (accountForm) {
   accountForm.addEventListener('submit', () => updateAccountPassword(accountModal));
 }
 
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
 document.querySelectorAll('dialog').forEach(modal => {
   modal.addEventListener('click', event => {
     if (event.target === modal) modal.close();

@@ -81,6 +81,7 @@ h1{font-weight:700;letter-spacing:-.25px}
 .date-stamp{color:#728da1}
 @media(max-width:780px){.help-grid{grid-template-columns:1fr}.clock-date{font-size:9px}.overview-clock{padding:11px 13px}.overview-clock strong{font-size:19px}.contract-edit-row{grid-template-columns:1fr auto}.contract-edit-row label{grid-column:1}.contract-edit-row>.button{grid-column:2;grid-row:2}}
 @media(max-width:480px){.clock-date{display:none}.overview-clock{margin-top:0}.contract-edit-row{grid-template-columns:1fr auto}.contract-edit-row label{grid-column:1 / -1}.contract-edit-row>.button{grid-column:2;grid-row:1}.news-card-open{gap:10px}.news-card-open .news-card-date{width:40px}}
+<<<<<<< HEAD
 
 body{font-size:15px}
 small{font-size:12px}
@@ -184,3 +185,5 @@ td{font-size:13px;color:#35546a}
   .account-form .modal-actions{flex-direction:column-reverse}
   .account-form .modal-actions .button{width:100%}
 }
+=======
+>>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
