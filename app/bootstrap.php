@@ -17,7 +17,6 @@ const APP_NAME = 'ฟ้าใสเพลส';
 const WATER_RATE = 18.00;
 const ELECTRIC_RATE = 8.00;
 
-<<<<<<< HEAD
 function database_config(): array
 {
     static $config = null;
@@ -118,8 +117,6 @@ function log_database_exception(PDOException $exception): string
     return $reference;
 }
 
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
 function db(): PDO
 {
     static $pdo = null;
@@ -128,9 +125,9 @@ function db(): PDO
         return $pdo;
     }
 
-<<<<<<< HEAD
     $config = database_config();
-    if ($config['password'] === '') {
+    $isLocalHost = in_array(strtolower($config['host']), ['localhost', '127.0.0.1', '::1'], true);
+    if ($config['password'] === '' && !$isLocalHost) {
         throw new RuntimeException('DB_PASSWORD is missing from the environment or .env file');
     }
     if (!ctype_digit($config['port']) || (int) $config['port'] < 1 || (int) $config['port'] > 65535) {
@@ -141,17 +138,6 @@ function db(): PDO
         "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']};charset={$config['charset']}",
         $config['username'],
         $config['password'],
-=======
-    $host = getenv('DB_HOST') ?: '127.0.0.1';
-    $name = getenv('DB_NAME') ?: 'fasai_place';
-    $user = getenv('DB_USER') ?: 'root';
-    $password = getenv('DB_PASSWORD') ?: '';
-
-    $pdo = new PDO(
-        "mysql:host={$host};dbname={$name};charset=utf8mb4",
-        $user,
-        $password,
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
         [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

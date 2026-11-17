@@ -12,11 +12,7 @@
 ## Project Conventions
 
 - Use PHP 8.2, PDO prepared statements, MySQL 8+, HTML, CSS, and vanilla JavaScript.
-<<<<<<< HEAD
 - Import `database/schema.sql` using phpMyAdmin. Preserve the nine Chapter 3 entities (`User`, `Room`, `Contract`, `Payment`, `MeterRecord`, `Repair`, `RepairDetail`, `CostType`, and `News`) and the approved `Invoice` and `Fine` extensions. `User.profileImage` and `News.image` store optional uploaded-file names; they do not add tables.
-=======
-- Import `database/fasai_place.sql` using XAMPP phpMyAdmin. Preserve the nine Chapter 3 entities (`User`, `Room`, `Contract`, `Payment`, `MeterRecord`, `Repair`, `RepairDetail`, `CostType`, and `News`) and the approved `Invoice` and `Fine` extensions. `User.profileImage` and `News.image` store optional uploaded-file names; they do not add tables.
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
 - Existing databases need the one-time schema update in `database/migrations/20261030_billing.sql`; do not run it twice.
 - `Invoice` stores monthly rent and utility snapshots; `Fine` stores tenant fines; `Payment.invoiceId`/`fineId` link submissions to exactly one billing item in application workflows.
 - The `Repair` table includes assignment, repair-result, and completion-photo fields to cover the stated workflow.
@@ -32,8 +28,4 @@ The report's scope includes monthly invoices and fines, while its original Data 
 
 ## Run Locally
 
-<<<<<<< HEAD
 Place the project under XAMPP `htdocs`, start Apache and MySQL, import `database/schema.sql` in phpMyAdmin, then open `http://127.0.0.1/fasai/`. Configure `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in `.env` for the selected database.
-=======
-Place the project under XAMPP `htdocs`, start Apache and MySQL, import `database/fasai_place.sql` in phpMyAdmin, then open `http://localhost/fasai/`. Configure `DB_HOST`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD` for non-default credentials.
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 function updateAccountPassword(modal) {
   const form = modal.querySelector('form');
   const password = form.querySelector('[data-password]');
@@ -64,8 +63,6 @@ function resetPasswordVisibility(form) {
   });
 }
 
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
 document.addEventListener('click', event => {
   const openButton = event.target.closest('[data-modal-open]');
   if (openButton) {
@@ -78,20 +75,14 @@ document.addEventListener('click', event => {
     if (modal && openButton.dataset.modalOpen === 'user-modal' && !openButton.dataset.editAccount) {
       const form = modal.querySelector('form');
       form.reset();
-<<<<<<< HEAD
       resetPasswordVisibility(form);
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
       form.querySelector('[name="userId"]').value = '';
       modal.querySelector('h2').textContent = 'เพิ่มบัญชีผู้ใช้งาน';
       modal.querySelector('[type="submit"]').textContent = 'สร้างบัญชี';
       form.querySelector('[name="password"]').required = true;
-<<<<<<< HEAD
       form.querySelector('[name="password_confirm"]').required = true;
       modal.querySelector('[data-password-note]').textContent = 'รหัสผ่านใหม่ต้องผ่านเงื่อนไขครบทุกข้อ';
       updateAccountPassword(modal);
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
     }
     if (modal && openButton.dataset.modalOpen === 'news-modal') {
       const form = modal.querySelector('form');
@@ -137,7 +128,6 @@ document.addEventListener('click', event => {
   const closeButton = event.target.closest('[data-modal-close]');
   if (closeButton) closeButton.closest('dialog')?.close();
 
-<<<<<<< HEAD
   const passwordToggle = event.target.closest('[data-toggle-password]');
   if (passwordToggle) {
     const input = passwordToggle.closest('.password-control').querySelector('input');
@@ -147,8 +137,6 @@ document.addEventListener('click', event => {
     passwordToggle.setAttribute('aria-label', visible ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน');
   }
 
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
   const dismissButton = event.target.closest('[data-dismiss]');
   if (dismissButton) dismissButton.closest('.alert')?.remove();
 
@@ -184,24 +172,18 @@ document.addEventListener('click', event => {
     const modal = document.getElementById('user-modal');
     const account = JSON.parse(editAccountButton.dataset.account);
     const form = modal.querySelector('form');
-<<<<<<< HEAD
     form.reset();
     resetPasswordVisibility(form);
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
     for (const [field, value] of Object.entries(account)) {
       const input = form.querySelector(`[name="${field}"]`);
       if (input) input.value = value;
     }
     form.querySelector('[name="password"]').value = '';
     form.querySelector('[name="password"]').required = false;
-<<<<<<< HEAD
     form.querySelector('[name="password_confirm"]').value = '';
     form.querySelector('[name="password_confirm"]').required = false;
     modal.querySelector('[data-password-note]').textContent = 'เว้นว่างทั้งสองช่องหากไม่ต้องการเปลี่ยนรหัสผ่าน';
     updateAccountPassword(modal);
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
     modal.querySelector('h2').textContent = 'แก้ไขบัญชีผู้ใช้งาน';
     modal.querySelector('[type="submit"]').textContent = 'บันทึกการแก้ไข';
     modal.showModal();
@@ -211,7 +193,6 @@ document.addEventListener('click', event => {
   if (confirmButton && !window.confirm(confirmButton.dataset.confirm)) event.preventDefault();
 });
 
-<<<<<<< HEAD
 const accountForm = document.querySelector('#user-modal form');
 if (accountForm) {
   const accountModal = document.getElementById('user-modal');
@@ -223,8 +204,6 @@ if (accountForm) {
   accountForm.addEventListener('submit', () => updateAccountPassword(accountModal));
 }
 
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
 document.querySelectorAll('dialog').forEach(modal => {
   modal.addEventListener('click', event => {
     if (event.target === modal) modal.close();
@@ -254,3 +233,92 @@ document.querySelectorAll('[data-table-search]').forEach(input => {
     });
   });
 });
+
+const invoiceForm = document.querySelector('[data-invoice-form]');
+if (invoiceForm) {
+  const contractInput = invoiceForm.querySelector('[data-invoice-contract]');
+  const monthInput = invoiceForm.querySelector('[data-invoice-month]');
+  const preview = invoiceForm.querySelector('[data-invoice-preview]');
+  const submitButton = invoiceForm.querySelector('[type="submit"]');
+  let lookupController;
+
+  const resetPreview = message => {
+    preview.dataset.state = 'idle';
+    preview.querySelector('[data-invoice-status]').textContent = message;
+    preview.querySelector('[data-invoice-rent]').textContent = '—';
+    preview.querySelector('[data-invoice-water]').textContent = '—';
+    preview.querySelector('[data-invoice-electric]').textContent = '—';
+    preview.querySelector('[data-invoice-total]').textContent = '—';
+    submitButton.disabled = false;
+  };
+
+  const lookupMeter = async () => {
+    lookupController?.abort();
+    if (!contractInput.value || !monthInput.value.trim()) {
+      resetPreview('เลือกห้องและระบุรอบบิลเพื่อดูข้อมูลมิเตอร์');
+      return;
+    }
+
+    lookupController = new AbortController();
+    const controller = lookupController;
+    const status = preview.querySelector('[data-invoice-status]');
+    preview.dataset.state = 'loading';
+    status.textContent = 'กำลังโหลดข้อมูลห้องและมิเตอร์...';
+    submitButton.disabled = true;
+
+    const url = new URL(invoiceForm.action, window.location.href);
+    url.searchParams.set('page', 'invoice_meter');
+    url.searchParams.set('contractId', contractInput.value);
+    url.searchParams.set('billMonth', monthInput.value.trim());
+
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: 'application/json' },
+        signal: controller.signal,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'โหลดข้อมูลมิเตอร์ไม่สำเร็จ');
+      if (lookupController !== controller) return;
+
+      if (data.invoiceExists) {
+        resetPreview(`รอบบิลนี้มีใบแจ้งหนี้ของห้อง ${data.roomNumber} แล้ว`);
+        preview.dataset.state = 'unavailable';
+        return;
+      }
+      if (!data.meterAvailable) {
+        resetPreview(`ไม่พบข้อมูลมิเตอร์ของห้อง ${data.roomNumber} ในรอบบิลนี้`);
+        preview.dataset.state = 'unavailable';
+        return;
+      }
+
+      const formatMoney = amount => new Intl.NumberFormat('th-TH', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount) + ' ฿';
+      const waterAmount = Number(data.waterUnit) * Number(data.waterRate);
+      const electricAmount = Number(data.electricUnit) * Number(data.electricRate);
+      const total = Number(data.rentalPrice) + waterAmount + electricAmount;
+
+      preview.querySelector('[data-invoice-rent]').textContent = formatMoney(Number(data.rentalPrice));
+      preview.querySelector('[data-invoice-water]').textContent = `${data.waterUnit} หน่วย · ${formatMoney(waterAmount)}`;
+      preview.querySelector('[data-invoice-electric]').textContent = `${data.electricUnit} หน่วย · ${formatMoney(electricAmount)}`;
+      preview.querySelector('[data-invoice-total]').textContent = formatMoney(total);
+      status.textContent = `ข้อมูลของห้อง ${data.roomNumber} · ${data.name}`;
+      preview.dataset.state = 'ready';
+      submitButton.disabled = false;
+    } catch (error) {
+      if (error.name === 'AbortError' || lookupController !== controller) return;
+      resetPreview(error.message || 'โหลดข้อมูลมิเตอร์ไม่สำเร็จ กรุณาลองใหม่');
+      preview.dataset.state = 'unavailable';
+    }
+  };
+
+  contractInput.addEventListener('change', lookupMeter);
+  monthInput.addEventListener('input', lookupMeter);
+  invoiceForm.addEventListener('submit', event => {
+    if (preview.dataset.state !== 'ready') {
+      event.preventDefault();
+      preview.querySelector('[data-invoice-status]').textContent = 'เลือกห้องที่มีข้อมูลมิเตอร์ของรอบบิลก่อนสร้างใบแจ้งหนี้';
+    }
+  });
+}

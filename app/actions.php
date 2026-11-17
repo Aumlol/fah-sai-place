@@ -202,7 +202,6 @@ try {
         $email = trim((string) ($_POST['email'] ?? ''));
         $phone = preg_replace('/\D+/', '', (string) ($_POST['phone'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
-<<<<<<< HEAD
         $passwordConfirmation = (string) ($_POST['password_confirm'] ?? '');
         $role = (string) ($_POST['role'] ?? '');
         if ($targetUserId === '' || $password !== '') {
@@ -222,11 +221,6 @@ try {
         }
         if ($name === '' || $username === '' || mb_strlen($username, 'UTF-8') > 50 || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($phone) !== 10 || !in_array($role, ['Tenant', 'Staff', 'Admin', 'Technician'], true)) {
             throw new RuntimeException('กรุณาตรวจสอบข้อมูลบัญชีผู้ใช้งาน');
-=======
-        $role = (string) ($_POST['role'] ?? '');
-        if ($name === '' || $username === '' || mb_strlen($username, 'UTF-8') > 50 || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($phone) !== 10 || ($targetUserId === '' && strlen($password) < 10) || ($password !== '' && strlen($password) < 10) || !in_array($role, ['Tenant', 'Staff', 'Admin', 'Technician'], true)) {
-            throw new RuntimeException('กรุณาตรวจสอบข้อมูลบัญชีและใช้รหัสผ่านอย่างน้อย 10 ตัวอักษร');
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
         }
         if ($targetUserId !== '') {
             $existingUser = db()->prepare('SELECT userId FROM `User` WHERE userId = ?');
@@ -316,61 +310,57 @@ try {
     if ($action === 'generate_invoices') {
         require_role(['Admin']);
         $billMonth = trim((string) ($_POST['billMonth'] ?? ''));
+        $contractId = trim((string) ($_POST['contractId'] ?? ''));
         $dueDate = trim((string) ($_POST['dueDate'] ?? ''));
         $dueDateValue = DateTime::createFromFormat('!Y-m-d', $dueDate);
-        if ($billMonth === '' || mb_strlen($billMonth, 'UTF-8') > 20 || !$dueDateValue || $dueDateValue->format('Y-m-d') !== $dueDate) {
-            throw new RuntimeException('กรุณาระบุเดือนและวันครบกำหนดชำระให้ถูกต้อง');
+        if ($contractId === '' || $billMonth === '' || mb_strlen($billMonth, 'UTF-8') > 20 || !$dueDateValue || $dueDateValue->format('Y-m-d') !== $dueDate) {
+            throw new RuntimeException('กรุณาเลือกห้อง ระบุเดือน และวันครบกำหนดชำระให้ถูกต้อง');
         }
 
         $connection = db();
         $connection->beginTransaction();
         try {
-            $statement = $connection->prepare(
-                "SELECT c.contractId, c.roomId, r.rentalPrice, m.waterUnit, m.electricUnit
+            $contractStatement = $connection->prepare(
+                "SELECT c.contractId, c.roomId, r.rentalPrice, r.roomNumber
                  FROM Contract c
                  JOIN Room r ON r.roomId = c.roomId
-                 LEFT JOIN MeterRecord m ON m.roomId = c.roomId AND m.month = ?
-                 WHERE c.status = 'ใช้งานอยู่'
-                 ORDER BY r.roomNumber"
+                 WHERE c.contractId = ? AND c.status = 'ใช้งานอยู่'
+                 FOR UPDATE"
             );
-            $statement->execute([$billMonth]);
-            $contracts = $statement->fetchAll();
-            if (!$contracts) {
-                throw new RuntimeException('ไม่มีสัญญาเช่าที่กำลังใช้งาน จึงยังสร้างใบแจ้งหนี้ไม่ได้');
+            $contractStatement->execute([$contractId]);
+            $contract = $contractStatement->fetch();
+            if (!$contract) {
+                throw new RuntimeException('ไม่พบสัญญาเช่าที่กำลังใช้งานของห้องที่เลือก');
+            }
+
+            $meterStatement = $connection->prepare('SELECT waterUnit, electricUnit FROM MeterRecord WHERE roomId = ? AND month = ?');
+            $meterStatement->execute([$contract['roomId'], $billMonth]);
+            $meter = $meterStatement->fetch();
+            if (!$meter) {
+                throw new RuntimeException("ไม่พบข้อมูลมิเตอร์ของห้อง {$contract['roomNumber']} ในรอบบิล {$billMonth} กรุณาบันทึกมิเตอร์ก่อนสร้างใบแจ้งหนี้");
             }
 
             $existingStatement = $connection->prepare('SELECT invoiceId FROM Invoice WHERE contractId = ? AND billMonth = ?');
+            $existingStatement->execute([$contract['contractId'], $billMonth]);
+            if ($existingStatement->fetch()) {
+                throw new RuntimeException("ห้อง {$contract['roomNumber']} มีใบแจ้งหนี้ของรอบบิล {$billMonth} แล้ว");
+            }
+
             $insertStatement = $connection->prepare(
                 "INSERT INTO Invoice (invoiceId, contractId, billMonth, dueDate, rentAmount, waterUnit, electricUnit, waterRate, electricRate)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
-            $created = 0;
-            $missingMeter = 0;
-            foreach ($contracts as $contract) {
-                $existingStatement->execute([$contract['contractId'], $billMonth]);
-                if ($existingStatement->fetch()) {
-                    continue;
-                }
-                if ($contract['waterUnit'] === null || $contract['electricUnit'] === null) {
-                    $missingMeter++;
-                    continue;
-                }
-                $insertStatement->execute([
-                    generate_id('INV-' . date('Y') . '-', 3),
-                    $contract['contractId'],
-                    $billMonth,
-                    $dueDate,
-                    $contract['rentalPrice'],
-                    $contract['waterUnit'],
-                    $contract['electricUnit'],
-                    WATER_RATE,
-                    ELECTRIC_RATE,
-                ]);
-                $created++;
-            }
-            if ($missingMeter > 0) {
-                throw new RuntimeException("ไม่พบข้อมูลมิเตอร์ของเดือน {$billMonth} สำหรับ {$missingMeter} สัญญา กรุณาบันทึกมิเตอร์ให้ครบก่อนสร้างใบแจ้งหนี้");
-            }
+            $insertStatement->execute([
+                generate_id('INV-' . date('Y') . '-', 3),
+                $contract['contractId'],
+                $billMonth,
+                $dueDate,
+                $contract['rentalPrice'],
+                $meter['waterUnit'],
+                $meter['electricUnit'],
+                WATER_RATE,
+                ELECTRIC_RATE,
+            ]);
             $connection->commit();
         } catch (Throwable $exception) {
             if ($connection->inTransaction()) {
@@ -378,7 +368,7 @@ try {
             }
             throw $exception;
         }
-        flash($created > 0 ? "สร้างใบแจ้งหนี้ {$created} รายการแล้ว" : 'ใบแจ้งหนี้ของเดือนนี้มีอยู่ครบแล้ว');
+        flash("สร้างใบแจ้งหนี้ห้อง {$contract['roomNumber']} รอบบิล {$billMonth} แล้ว");
         redirect('payments');
     }
 
@@ -694,22 +684,14 @@ try {
     redirect((string) ($_POST['return_page'] ?? 'dashboard'));
 } catch (Throwable $exception) {
     if ($exception instanceof PDOException) {
-<<<<<<< HEAD
         $reference = log_database_exception($exception);
-=======
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
         $sqlState = (string) ($exception->errorInfo[0] ?? $exception->getCode());
         $message = match ($sqlState) {
             '23000' => 'ข้อมูลซ้ำกับรายการที่มีอยู่แล้ว กรุณาตรวจสอบชื่อผู้ใช้ อีเมล หรือข้อมูลที่เกี่ยวข้อง',
             '42S22', '42S02' => 'โครงสร้างฐานข้อมูลยังไม่อัปเดต กรุณารันคำสั่ง migration ที่ระบุใน README.md แล้วลองใหม่',
-<<<<<<< HEAD
             default => 'บันทึกหรือเข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบค่า DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD และสิทธิ์ฐานข้อมูล',
         };
         $message .= ' (รหัสตรวจสอบ: ' . $reference . ')';
-=======
-            default => 'บันทึกหรือเข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบว่า MySQL ทำงานอยู่และฐานข้อมูล fasai_place พร้อมใช้งาน',
-        };
->>>>>>> 633a60ea08f1d6620df67bfa732e618a9531774f
         flash($message, 'error');
     } else {
         flash($exception->getMessage(), 'error');
