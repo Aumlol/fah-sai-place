@@ -52,6 +52,21 @@ function updateAccountPassword(modal) {
   }
 }
 
+function addMobileTableLabels() {
+  document.querySelectorAll('.table-scroll table').forEach(table => {
+    const labels = Array.from(table.querySelectorAll('thead th'), th => th.textContent.trim());
+    table.querySelectorAll('tbody tr').forEach(row => {
+      Array.from(row.children).forEach((cell, index) => {
+        if (!cell.dataset.label) {
+          cell.dataset.label = labels[index] || '';
+        }
+      });
+    });
+  });
+}
+
+addMobileTableLabels();
+
 function resetPasswordVisibility(form) {
   form.querySelectorAll('.password-control').forEach(control => {
     control.querySelector('input').type = 'password';
@@ -313,7 +328,7 @@ if (invoiceForm) {
     preview.querySelector('[data-invoice-water]').textContent = '—';
     preview.querySelector('[data-invoice-electric]').textContent = '—';
     preview.querySelector('[data-invoice-total]').textContent = '—';
-    submitButton.disabled = false;
+    submitButton.disabled = true;
   };
 
   const lookupMeter = async () => {

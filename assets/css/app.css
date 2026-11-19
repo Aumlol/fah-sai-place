@@ -83,6 +83,164 @@ h1{font-weight:700;letter-spacing:-.25px}
 @media(max-width:780px){.help-grid{grid-template-columns:1fr}.clock-date{font-size:9px}.overview-clock{padding:11px 13px}.overview-clock strong{font-size:19px}.contract-edit-row{grid-template-columns:1fr auto}.contract-edit-row label{grid-column:1}.contract-edit-row>.button{grid-column:2;grid-row:2}}
 @media(max-width:480px){.clock-date{display:none}.overview-clock{margin-top:0}.contract-edit-row{grid-template-columns:1fr auto}.contract-edit-row label{grid-column:1 / -1}.contract-edit-row>.button{grid-column:2;grid-row:1}.news-card-open{gap:10px}.news-card-open .news-card-date{width:40px}}
 
+/* Readable scale for laptops, tablets, and mobile devices */
+body{font-size:16px}
+.sidebar-brand strong{font-size:18px}
+.sidebar-brand small{font-size:9px}
+.nav-link{height:46px;font-size:15px}
+.breadcrumb{font-size:14px}
+.date-stamp{font-size:13px}
+.user-meta strong{font-size:14px}
+.user-meta small{font-size:12px}
+.page-heading h1{font-size:34px}
+.page-heading .muted{font-size:15px}
+.panel-heading h2{font-size:19px}
+.eyebrow{font-size:11px}
+.button{font-size:14px;padding:12px 16px}
+.button.tiny{font-size:12px;padding:7px 10px}
+.metric-top{font-size:14px}
+.metric-card>strong{font-size:28px}
+.metric-card>small{font-size:12px}
+.quick-link strong{font-size:14px}
+.quick-link small{font-size:12px}
+.news-item strong,.news-card-title{font-size:14px}
+.news-summary,.news-card-summary{font-size:13px}
+.table-toolbar .panel-caption,.period-chip,.panel-caption{font-size:12px}
+th{font-size:12px}
+td{font-size:14px}
+.status-pill{font-size:11px}
+.inline-form label,.form-stack label,.modal-form label,.profile-form label{font-size:13px}
+.inline-form input,.inline-form select,.inline-form textarea,.form-stack input,.modal-form input,.modal-form select,.modal-form textarea,.profile-form input,.repair-controls input,.repair-controls select{font-size:14px;height:42px}
+.repair-card h2{font-size:17px}
+.repair-card>p,.repair-assignee,.repair-result-form label,.repair-result-form textarea,.repair-result-form input{font-size:13px}
+.repair-assignee{line-height:1.6}
+.repair-controls{flex-wrap:wrap}
+.repair-result-form textarea{min-height:58px}
+.text-link{font-size:13px}
+.alert{font-size:14px}
+.form-hint{font-size:12px}
+
+@media(max-width:780px){
+  .sidebar-brand strong{font-size:17px}
+  .nav-link{height:48px;font-size:15px}
+  .page-heading h1{font-size:29px}
+  .button{min-height:44px;font-size:14px}
+  .repair-result-form{grid-template-columns:1fr}
+  .repair-result-form .button{width:100%}
+  .cost-controls{grid-template-columns:1fr}
+  .table-scroll table{min-width:760px}
+}
+@media(max-width:480px){
+  body{font-size:16px}
+  .topbar-actions .avatar{width:38px;height:38px}
+  .page-heading h1{font-size:26px}
+  .page-heading .muted{font-size:14px}
+  .panel-heading h2{font-size:18px}
+  .metric-card>strong{font-size:21px}
+  .metric-top{font-size:12px}
+  .metric-card>small{font-size:11px}
+  .quick-link strong{font-size:14px}
+  .quick-link small{font-size:12px}
+  .inline-form input,.inline-form select,.modal-form input,.modal-form select,.repair-controls input,.repair-controls select{height:44px;font-size:14px}
+  .button{width:100%;font-size:14px}
+  .repair-controls .button,.repair-result-form .button{width:100%}
+  .repair-card{padding:16px}
+  .repair-card h2{font-size:17px}
+  .status-pill{font-size:11px}
+  .modal-form{padding:18px}
+}
+
+/* Final readable and cohesive type scale */
+body{
+  font-family:"Noto Sans Thai","Leelawadee UI","Segoe UI",Tahoma,sans-serif;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button,input,select,textarea,a{
+  font-family:"Noto Sans Thai","Leelawadee UI","Segoe UI",Tahoma,sans-serif;
+}
+.page-heading h1{
+  font-size:28px;
+  line-height:1.25;
+  letter-spacing:-.2px;
+}
+.panel-heading h2,
+.repair-card h2,
+.news-card-body h2,
+.profile-details h2{
+  font-size:17px;
+  line-height:1.35;
+  letter-spacing:-.1px;
+}
+.metric-card>strong{
+  font-family:"Noto Sans Thai","Leelawadee UI","Segoe UI",Tahoma,sans-serif;
+  font-size:24px;
+  font-weight:750;
+}
+.sidebar-brand strong{font-size:16px}
+.sidebar-brand small{font-size:8px}
+.nav-link{font-size:14px;font-weight:550}
+.breadcrumb{font-size:13px}
+.page-heading .muted{font-size:14px;color:#6f8798}
+.eyebrow{font-size:10px;letter-spacing:1.15px}
+.button{font-size:13px;border-radius:8px}
+.button.tiny{font-size:12px}
+.metric-top{font-size:12px}
+.quick-link strong{font-size:13px}
+.quick-link small{font-size:11px}
+.news-item strong,.news-card-title{font-size:13px}
+.news-summary,.news-card-summary{font-size:12px}
+th{font-size:11px}
+td{font-size:13px}
+.status-pill{font-size:10px}
+.inline-form label,.form-stack label,.modal-form label,.profile-form label{
+  font-size:12px;
+  color:#607d90;
+}
+.inline-form input,.inline-form select,.inline-form textarea,
+.form-stack input,.modal-form input,.modal-form select,.modal-form textarea,
+.profile-form input,.repair-controls input,.repair-controls select{
+  font-size:13px;
+  border-color:#dce8ef;
+  background:#fff;
+}
+.repair-card>p,.repair-assignee,.repair-result-form label,
+.repair-result-form textarea,.repair-result-form input{
+  font-size:12px;
+}
+.text-link{font-size:12px}
+.alert{font-size:13px}
+.panel,.metric-card{
+  border-color:#deebf2;
+  border-radius:12px;
+  box-shadow:0 10px 28px rgba(37,91,126,.065);
+}
+.repair-card,.quick-link,.news-card,.account-section{
+  border-radius:10px;
+}
+
+@media(max-width:780px){
+  body{font-size:15px}
+  .page-heading h1{font-size:25px}
+  .panel-heading h2,.repair-card h2{font-size:16px}
+  .nav-link{font-size:13px}
+  .metric-card>strong{font-size:21px}
+  .inline-form input,.inline-form select,.modal-form input,
+  .modal-form select,.repair-controls input,.repair-controls select{
+    height:44px;
+  }
+}
+@media(max-width:480px){
+  body{font-size:15px}
+  .page-heading h1{font-size:23px}
+  .page-heading .muted{font-size:13px}
+  .panel-heading h2,.repair-card h2{font-size:16px}
+  .metric-card>strong{font-size:20px}
+  .metric-top{font-size:11px}
+  th,td{font-size:12px}
+}
+
 body{font-size:15px}
 small{font-size:12px}
 h1{font-size:28px}
@@ -187,4 +345,301 @@ td{font-size:13px;color:#35546a}
   .password-checklist{grid-template-columns:1fr}
   .account-form .modal-actions{flex-direction:column-reverse}
   .account-form .modal-actions .button{width:100%}
+}
+
+/* Keep table headings and content safely inside narrow screens */
+.table-panel,
+.table-scroll,
+.table-scroll table{
+  max-width:100%;
+}
+.table-panel .panel-heading{
+  align-items:center;
+  min-width:0;
+  margin-bottom:0;
+}
+.table-panel .panel-heading>div{
+  min-width:0;
+}
+.table-panel .panel-heading h2{
+  overflow-wrap:anywhere;
+}
+@media(max-width:780px){
+  .content-wrap{
+    width:100%;
+    max-width:100%;
+  }
+  .table-panel{
+    width:100%;
+  }
+  .table-panel .panel-heading{
+    padding:16px;
+  }
+  .table-scroll table{
+    min-width:620px;
+  }
+  th,td{
+    padding:11px 12px;
+  }
+}
+@media(max-width:480px){
+  .content-wrap{
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .table-panel .panel-heading{
+    padding:14px;
+  }
+  .table-panel .panel-heading h2{
+    line-height:1.25;
+  }
+  .table-panel .panel-caption{
+    flex:0 0 auto;
+  }
+  .table-scroll table{
+    min-width:560px;
+  }
+  th,td{
+    padding:10px 12px;
+  }
+  .page-heading,
+  .panel-heading,
+  .empty-state{
+    min-width:0;
+  }
+}
+
+/* Mobile card tables: keep every field readable instead of horizontal scrolling */
+@media(max-width:780px){
+  .content-wrap{
+    padding:16px 12px 32px;
+  }
+  .topbar{
+    height:58px;
+  }
+  .breadcrumb{
+    min-width:0;
+  }
+  .breadcrumb span,
+  .breadcrumb-divider{
+    display:none;
+  }
+  .breadcrumb strong{
+    font-size:14px;
+  }
+  .topbar-actions{
+    gap:5px;
+  }
+  .topbar-actions .button{
+    width:auto;
+    min-height:38px;
+    padding:7px 9px;
+    font-size:12px;
+  }
+  .page-heading{
+    margin-bottom:18px;
+  }
+  .page-heading h1{
+    font-size:22px;
+  }
+  .page-heading .muted{
+    line-height:1.55;
+  }
+  .panel,
+  .form-panel,
+  .table-panel,
+  .metric-card,
+  .repair-card,
+  .news-card{
+    width:100%;
+  }
+  .panel{
+    padding:14px;
+  }
+  .table-panel{
+    padding:0;
+  }
+  .panel-heading{
+    gap:10px;
+    align-items:flex-start;
+  }
+  .table-panel .panel-heading{
+    padding:20px 22px;
+  }
+  .panel-heading h2,
+  .repair-card h2{
+    font-size:16px;
+  }
+  .panel-caption{
+    font-size:11px;
+  }
+  .table-scroll{
+    overflow:visible;
+  }
+  .table-scroll table{
+    display:block;
+    width:100%;
+    min-width:0 !important;
+    white-space:normal;
+  }
+  .table-scroll thead{
+    display:none;
+  }
+  .table-scroll tbody{
+    display:grid;
+    gap:10px;
+    padding:10px;
+  }
+  .table-scroll tbody tr{
+    display:grid;
+    width:100%;
+    min-width:0;
+    gap:0;
+    border:1px solid #e1ebf2;
+    border-radius:10px;
+    background:#fff;
+    box-shadow:0 5px 16px rgba(37,91,126,.055);
+  }
+  .table-scroll tbody tr:hover{
+    background:#fff;
+  }
+  .table-scroll tbody td{
+    display:grid;
+    grid-template-columns:minmax(88px,38%) minmax(0,62%);
+    align-items:start;
+    gap:8px;
+    width:100%;
+    min-width:0;
+    padding:8px 10px;
+    border-bottom:1px solid #eef3f6;
+    color:#35546a;
+    font-size:13px;
+    white-space:normal;
+  }
+  .table-scroll tbody td:last-child{
+    border-bottom:0;
+  }
+  .table-scroll tbody td::before{
+    content:attr(data-label);
+    color:#7b91a1;
+    font-size:11px;
+    font-weight:700;
+  }
+  .table-scroll tbody td[rowspan]::before,
+  .table-scroll tbody td:empty::before{
+    display:none;
+  }
+  .table-scroll tbody td strong{
+    overflow-wrap:anywhere;
+  }
+  .table-scroll .row-actions,
+  .table-scroll .role-form{
+    flex-wrap:wrap;
+  }
+  .table-scroll .row-actions .button,
+  .table-scroll .role-form .button,
+  .table-scroll .role-form select,
+  .table-scroll .icon-button{
+    width:auto;
+  }
+  .inline-form,
+  .payment-form,
+  .repair-form,
+  .cost-controls,
+  .form-row,
+  .lease-details,
+  .metric-grid,
+  .dashboard-grid,
+  .repair-grid,
+  .profile-details dl{
+    grid-template-columns:1fr;
+  }
+  .inline-form label,
+  .inline-form .wide,
+  .inline-form .button,
+  .payment-form label,
+  .repair-form label,
+  .repair-form .wide{
+    grid-column:1;
+  }
+  .inline-form input,
+  .inline-form select,
+  .inline-form textarea,
+  .payment-form input,
+  .payment-form select,
+  .repair-form input,
+  .repair-form select,
+  .repair-form textarea,
+  .modal-form input,
+  .modal-form select,
+  .modal-form textarea{
+    width:100%;
+  }
+  .inline-form .button,
+  .payment-form .button,
+  .repair-form .button,
+  .modal-actions .button{
+    width:100%;
+  }
+  .invoice-meter-values{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .quick-grid{
+    grid-template-columns:1fr;
+  }
+  .metric-card{
+    min-height:112px;
+  }
+  .repair-result-form,
+  .repair-controls,
+  .repair-controls form,
+  .contract-edit-row,
+  .role-form{
+    width:100%;
+  }
+  .repair-result-form,
+  .contract-edit-row{
+    grid-template-columns:1fr;
+  }
+  .contract-edit-row>.button{
+    grid-column:1;
+  }
+  .profile-panel{
+    display:block;
+  }
+  .modal{
+    width:calc(100vw - 16px);
+  }
+  .modal-form{
+    max-height:calc(100vh - 16px);
+    overflow-y:auto;
+  }
+}
+
+@media(max-width:780px){
+  .table-panel{
+    width:calc(100% - 16px);
+    margin:0 8px 18px;
+  }
+  .table-panel .panel-heading{
+    padding:22px 32px 20px !important;
+    margin-bottom:0;
+  }
+  .table-panel .panel-heading>div{
+    min-width:0;
+    padding:0;
+  }
+  .table-panel .panel-heading .eyebrow{
+    margin:0 0 8px;
+    line-height:1.4;
+  }
+  .table-panel .panel-heading h2{
+    margin:0;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+  }
+  .table-panel .table-scroll tbody{
+    padding:10px 14px 14px;
+  }
 }

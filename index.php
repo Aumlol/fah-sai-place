@@ -21,7 +21,7 @@ if ($page === 'invoice_meter') {
         echo json_encode(['error' => 'กรุณาเข้าสู่ระบบใหม่'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    if ($user['role'] !== 'Admin') {
+    if (!in_array($user['role'], ['Admin', 'Staff'], true)) {
         http_response_code(403);
         echo json_encode(['error' => 'ไม่มีสิทธิ์ดูข้อมูลมิเตอร์'], JSON_UNESCAPED_UNICODE);
         exit;

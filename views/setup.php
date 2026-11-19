@@ -7,7 +7,7 @@ require_once __DIR__ . '/../app/helpers.php';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ตั้งค่าผู้ดูแลระบบ | <?= e(APP_NAME) ?></title>
-  <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="assets/css/app.css?v=<?= e((string) filemtime(__DIR__ . '/../assets/css/app.css')) ?>-heading-spacing">
 </head>
 <body class="login-page">
   <main class="setup-card">

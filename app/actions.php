@@ -384,7 +384,7 @@ try {
     }
 
     if ($action === 'generate_invoices') {
-        require_role(['Admin']);
+        require_role(['Admin', 'Staff']);
         $billMonth = normalize_billing_month((string) ($_POST['billMonth'] ?? ''));
         $contractId = trim((string) ($_POST['contractId'] ?? ''));
         $dueDate = trim((string) ($_POST['dueDate'] ?? ''));
@@ -463,7 +463,7 @@ try {
     }
 
     if ($action === 'create_fine') {
-        require_role(['Admin']);
+        require_role(['Admin', 'Staff']);
         $contractId = trim((string) ($_POST['contractId'] ?? ''));
         $description = trim((string) ($_POST['description'] ?? ''));
         $amount = filter_var($_POST['amount'] ?? null, FILTER_VALIDATE_FLOAT);
@@ -547,46 +547,54 @@ try {
             throw new RuntimeException('กรุณาเลือกรายการที่ต้องการชำระและตรวจสอบวันที่ชำระ');
         }
 
-        if ($billingType === 'invoice') {
-            $billingStatement = db()->prepare(
-                "SELECT i.invoiceId, i.contractId,
-                        i.rentAmount + (i.waterUnit * i.waterRate) + (i.electricUnit * i.electricRate) AS amount
-                 FROM Invoice i
-                 JOIN Contract c ON c.contractId = i.contractId
-                 WHERE i.invoiceId = ? AND c.userId = ? AND i.status = 'รอชำระ'"
-            );
-            $billingStatement->execute([$billingId, $user['userId']]);
-            $billingRecord = $billingStatement->fetch();
-            $invoiceId = $billingId;
-            $fineId = null;
-        } else {
-            $billingStatement = db()->prepare(
-                "SELECT f.fineId, f.contractId, f.amount
-                 FROM Fine f
-                 JOIN Contract c ON c.contractId = f.contractId
-                 WHERE f.fineId = ? AND c.userId = ? AND f.status = 'รอชำระ'"
-            );
-            $billingStatement->execute([$billingId, $user['userId']]);
-            $billingRecord = $billingStatement->fetch();
-            $invoiceId = null;
-            $fineId = $billingId;
-        }
-        if (!$billingRecord) {
-            throw new RuntimeException('ไม่พบรายการค้างชำระของบัญชีนี้ หรือรายการได้รับชำระแล้ว');
-        }
-        $pendingStatement = $billingType === 'invoice'
-            ? db()->prepare("SELECT paymentId FROM Payment WHERE invoiceId = ? AND status = 'รอตรวจสอบ' LIMIT 1")
-            : db()->prepare("SELECT paymentId FROM Payment WHERE fineId = ? AND status = 'รอตรวจสอบ' LIMIT 1");
-        $pendingStatement->execute([$billingId]);
-        if ($pendingStatement->fetch()) {
-            throw new RuntimeException('รายการนี้มีหลักฐานรอตรวจสอบอยู่แล้ว กรุณารอผลก่อนส่งซ้ำ');
-        }
         $evidence = save_image_upload('evidence', 'payments', true);
+        $connection = db();
+        $connection->beginTransaction();
         try {
+            if ($billingType === 'invoice') {
+                $billingStatement = $connection->prepare(
+                    "SELECT i.invoiceId, i.contractId,
+                            i.rentAmount + (i.waterUnit * i.waterRate) + (i.electricUnit * i.electricRate) AS amount
+                     FROM Invoice i
+                     JOIN Contract c ON c.contractId = i.contractId
+                     WHERE i.invoiceId = ? AND c.userId = ? AND i.status = 'รอชำระ'
+                     FOR UPDATE"
+                );
+                $billingStatement->execute([$billingId, $user['userId']]);
+                $billingRecord = $billingStatement->fetch();
+                $invoiceId = $billingId;
+                $fineId = null;
+            } else {
+                $billingStatement = $connection->prepare(
+                    "SELECT f.fineId, f.contractId, f.amount
+                     FROM Fine f
+                     JOIN Contract c ON c.contractId = f.contractId
+                     WHERE f.fineId = ? AND c.userId = ? AND f.status = 'รอชำระ'
+                     FOR UPDATE"
+                );
+                $billingStatement->execute([$billingId, $user['userId']]);
+                $billingRecord = $billingStatement->fetch();
+                $invoiceId = null;
+                $fineId = $billingId;
+            }
+            if (!$billingRecord) {
+                throw new RuntimeException('ไม่พบรายการค้างชำระของบัญชีนี้ หรือรายการได้รับชำระแล้ว');
+            }
+            $pendingStatement = $billingType === 'invoice'
+                ? $connection->prepare("SELECT paymentId FROM Payment WHERE invoiceId = ? AND status = 'รอตรวจสอบ' LIMIT 1")
+                : $connection->prepare("SELECT paymentId FROM Payment WHERE fineId = ? AND status = 'รอตรวจสอบ' LIMIT 1");
+            $pendingStatement->execute([$billingId]);
+            if ($pendingStatement->fetch()) {
+                throw new RuntimeException('รายการนี้มีหลักฐานรอตรวจสอบอยู่แล้ว กรุณารอผลก่อนส่งซ้ำ');
+            }
             $paymentId = generate_id('PAY-' . date('Y') . '-', 3);
-            $insert = db()->prepare("INSERT INTO Payment (paymentId, contractId, invoiceId, fineId, paymentDate, amount, evidence, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'รอตรวจสอบ')");
+            $insert = $connection->prepare("INSERT INTO Payment (paymentId, contractId, invoiceId, fineId, paymentDate, amount, evidence, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'รอตรวจสอบ')");
             $insert->execute([$paymentId, $billingRecord['contractId'], $invoiceId, $fineId, $paymentDate, $billingRecord['amount'], $evidence]);
+            $connection->commit();
         } catch (Throwable $exception) {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
             if ($evidence) {
                 @unlink(dirname(__DIR__) . '/uploads/payments/' . $evidence);
             }
@@ -694,7 +702,7 @@ try {
         if (mb_strlen($result, 'UTF-8') > 2000) {
             throw new RuntimeException('รายละเอียดผลการซ่อมยาวเกินกำหนด');
         }
-        $ownership = db()->prepare('SELECT repairId FROM Repair WHERE repairId = ? AND maintenanceUserId = ?');
+        $ownership = db()->prepare("SELECT repairId FROM Repair WHERE repairId = ? AND maintenanceUserId = ? AND repairStatus NOT IN ('ซ่อมเสร็จแล้ว', 'ยกเลิก')");
         $ownership->execute([$repairId, $user['userId']]);
         if (!$ownership->fetch()) {
             throw new RuntimeException('ไม่พบงานซ่อมที่มอบหมายให้บัญชีนี้');
@@ -734,7 +742,7 @@ try {
 
     if (in_array($action, ['approve_repair_cost', 'reject_repair_cost'], true)) {
         require_role(['Admin']);
-        $status = $action === 'approve_repair_cost' ? 'กำลังซ่อม' : 'รอตรวจสอบค่าใช้จ่าย';
+        $status = $action === 'approve_repair_cost' ? 'กำลังซ่อม' : 'รอแก้ไขค่าใช้จ่าย';
         $statement = db()->prepare("UPDATE Repair SET repairStatus = ? WHERE repairId = ? AND repairStatus = 'รออนุมัติค่าใช้จ่าย'");
         $statement->execute([$status, (string) ($_POST['repairId'] ?? '')]);
         flash($action === 'approve_repair_cost' ? 'อนุมัติค่าใช้จ่ายแล้ว' : 'ส่งรายการกลับให้ช่างแก้ไขแล้ว');
