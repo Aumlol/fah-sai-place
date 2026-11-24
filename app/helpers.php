@@ -13,6 +13,7 @@ function money(float|int|string $amount): string
     return number_format((float) $amount, 2);
 }
 
+<<<<<<< HEAD
 function thai_date(?string $dateString): string
 {
     if ($dateString === null || trim($dateString) === '') {
@@ -47,6 +48,8 @@ function thai_month_year(?string $dateString): string
     return ($thaiMonths[$m] ?? date('M', $timestamp)) . ' ' . $y;
 }
 
+=======
+>>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
 function normalize_billing_month(string $month): ?string
 {
     if (!preg_match('/^(\d{1,2})\/(\d{4})$/D', trim($month), $matches)) {

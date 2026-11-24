@@ -138,9 +138,12 @@ erDiagram
 | `image` | VARCHAR(255) | - | รูปประกอบก่อนซ่อม |
 | `repairResult` | TEXT | - | ผลการซ่อม |
 | `completionImage` | VARCHAR(255) | - | รูปหลังซ่อม |
+<<<<<<< HEAD
 | `quoteAmount` | DECIMAL(10,2) | - | ราคาที่ช่างเสนอ |
 | `quoteNote` | VARCHAR(500) | - | รายละเอียดใบเสนอราคา |
 | `workImage` | VARCHAR(255) | - | รูปหลักฐานก่อนเริ่มงานหลังราคาได้รับอนุมัติ |
+=======
+>>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
 | `repairStatus` | VARCHAR(30) | - | สถานะงานซ่อม |
 | `repairDate` | DATE | - | วันที่แจ้งซ่อม |
 

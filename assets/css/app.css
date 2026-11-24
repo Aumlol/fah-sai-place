@@ -343,7 +343,10 @@ td{font-size:13px;color:#35546a}
   align-items:center;
   min-width:0;
   margin-bottom:0;
+<<<<<<< HEAD
   padding:20px 24px 12px;
+=======
+>>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
 }
 .table-panel .panel-heading>div{
   min-width:0;
@@ -630,6 +633,7 @@ td{font-size:13px;color:#35546a}
     padding:10px 14px 14px;
   }
 }
+<<<<<<< HEAD
 
 /* === Light Sky Blue & White Collapsible Sidebar === */
 .sidebar {
@@ -1795,3 +1799,5 @@ input[type="file"]::file-selector-button {
 input[type="file"]::file-selector-button:hover {
   background: #bae6fd;
 }
+=======
+>>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
