@@ -71,8 +71,8 @@ erDiagram
 | `billMonth` | VARCHAR(20) | UNIQUE ร่วม | รอบบิล รูปแบบ MM/YYYY |
 | `dueDate` | DATE | - | วันครบกำหนด |
 | `rentAmount` | DECIMAL(10,2) | - | ค่าเช่า ณ วันที่ออกใบ |
-| `waterUnit` | DECIMAL(10,2) | - | หน่วยน้ำ |
-| `electricUnit` | DECIMAL(10,2) | - | หน่วยไฟ |
+| `waterUnit` | DECIMAL(10,2) | - | หน่วยน้ำที่ใช้ในรอบบิล |
+| `electricUnit` | DECIMAL(10,2) | - | หน่วยไฟที่ใช้ในรอบบิล |
 | `waterRate` | DECIMAL(10,2) | - | อัตราค่าน้ำต่อหน่วย |
 | `electricRate` | DECIMAL(10,2) | - | อัตราค่าไฟต่อหน่วย |
 | `status` | VARCHAR(30) | - | รอชำระหรือชำระแล้ว |
@@ -117,12 +117,18 @@ erDiagram
 |---|---|---|---|
 | `meterId` | VARCHAR(12) | **PK** | รหัสบันทึกมิเตอร์ |
 | `roomId` | VARCHAR(9) | **FK → Room(roomId)** | ห้องที่บันทึก |
-| `waterUnit` | DECIMAL(10,2) | - | หน่วยน้ำ |
-| `electricUnit` | DECIMAL(10,2) | - | หน่วยไฟ |
+| `waterUnit` | DECIMAL(10,2) | - | หน่วยน้ำที่ใช้ในรอบนี้ (รายการใหม่คำนวณจากผลต่างเลขสะสม; ข้อมูลเดิมคงค่าหน่วยใช้ที่บันทึกไว้) |
+| `electricUnit` | DECIMAL(10,2) | - | หน่วยไฟที่ใช้ในรอบนี้ (รายการใหม่คำนวณจากผลต่างเลขสะสม; ข้อมูลเดิมคงค่าหน่วยใช้ที่บันทึกไว้) |
+| `waterReading` | DECIMAL(10,2) | - | เลขมิเตอร์น้ำสะสมปัจจุบัน |
+| `electricReading` | DECIMAL(10,2) | - | เลขมิเตอร์ไฟสะสมปัจจุบัน |
+| `usageCalculated` | TINYINT(1) | - | ระบุว่าหน่วยใช้ถูกคำนวณจากส่วนต่างแล้ว |
+| `waterReset` | TINYINT(1) | - | มิเตอร์น้ำเริ่มนับใหม่ในรอบนี้ |
+| `electricReset` | TINYINT(1) | - | มิเตอร์ไฟเริ่มนับใหม่ในรอบนี้ |
 | `recordDate` | DATE | - | วันที่บันทึกจริง |
 | `month` | VARCHAR(20) | UNIQUE ร่วมกับ roomId | รอบมิเตอร์ |
 
 `UNIQUE(roomId, month)` ห้ามบันทึกมิเตอร์ซ้ำห้องและรอบเดือนเดียวกัน
+ข้อมูลเดิมที่ `usageCalculated = 0` ยังนำค่า `waterUnit` และ `electricUnit` ที่บันทึกไว้ไปคำนวณยอดและออกใบแจ้งหนี้ได้ โดยไม่คำนวณประวัติย้อนหลัง
 
 ## 8. ตาราง `Repair`
 
@@ -133,17 +139,14 @@ erDiagram
 | `repairId` | VARCHAR(12) | **PK** | รหัสงานซ่อม |
 | `userId` | VARCHAR(8) | **FK → User(userId)** | ผู้แจ้งซ่อม |
 | `roomId` | VARCHAR(9) | **FK → Room(roomId)** | ห้องที่แจ้งซ่อม |
-| `maintenanceUserId` | VARCHAR(8) | **FK → User(userId)** หรือ NULL | ช่างผู้รับผิดชอบ |
+| `maintenanceUserId` | VARCHAR(8) | **FK → User(userId)** หรือ NULL | ช่างผู้รับผิดชอบที่ Staff มอบหมาย |
 | `detail` | VARCHAR(500) | - | รายละเอียดปัญหา |
 | `image` | VARCHAR(255) | - | รูปประกอบก่อนซ่อม |
 | `repairResult` | TEXT | - | ผลการซ่อม |
 | `completionImage` | VARCHAR(255) | - | รูปหลังซ่อม |
-<<<<<<< HEAD
-| `quoteAmount` | DECIMAL(10,2) | - | ราคาที่ช่างเสนอ |
-| `quoteNote` | VARCHAR(500) | - | รายละเอียดใบเสนอราคา |
+| `quoteAmount` | DECIMAL(10,2) | - | ช่องเก็บยอดรวมราคาเสนอ (ยอดที่แสดงคำนวณจาก `RepairDetail`) |
+| `quoteNote` | VARCHAR(500) | - | รายละเอียดประกอบราคาเสนอ |
 | `workImage` | VARCHAR(255) | - | รูปหลักฐานก่อนเริ่มงานหลังราคาได้รับอนุมัติ |
-=======
->>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
 | `repairStatus` | VARCHAR(30) | - | สถานะงานซ่อม |
 | `repairDate` | DATE | - | วันที่แจ้งซ่อม |
 
@@ -158,13 +161,13 @@ erDiagram
 
 ## 10. ตาราง `RepairDetail`
 
-เก็บรายการอุปกรณ์และค่าใช้จ่ายแต่ละงานซ่อม
+เก็บรายการอุปกรณ์และค่าใช้จ่ายที่ช่างเสนอให้ Staff ตรวจสอบ ก่อนส่งให้ Admin อนุมัติ
 
 | Field | ประเภทข้อมูล | กุญแจ | คำอธิบาย |
 |---|---|---|---|
 | `repairId` | VARCHAR(12) | **PK, FK → Repair(repairId)** | งานซ่อม |
 | `costTypeId` | VARCHAR(5) | **PK, FK → CostType(costTypeId)** | ประเภทค่าใช้จ่าย |
-| `equipment` | VARCHAR(100) | - | รายการอุปกรณ์หรือค่าแรง |
+| `equipment` | VARCHAR(100) | - | รายการ/ประเภทค่าใช้จ่ายที่เสนอ (การกรอกแบบสรุปจะใช้ชื่อประเภท) |
 | `amount` | DECIMAL(10,2) | - | จำนวนเงิน |
 
 Primary Key แบบ composite คือ `(repairId, costTypeId)` ทำให้งานซ่อมหนึ่งงานมีได้หนึ่งรายการต่อหนึ่งประเภทค่าใช้จ่าย

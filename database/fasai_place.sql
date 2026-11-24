@@ -126,6 +126,11 @@ CREATE TABLE IF NOT EXISTS MeterRecord (
   roomId VARCHAR(9) NOT NULL,
   waterUnit DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   electricUnit DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  waterReading DECIMAL(10,2) DEFAULT NULL,
+  electricReading DECIMAL(10,2) DEFAULT NULL,
+  usageCalculated TINYINT(1) NOT NULL DEFAULT 0,
+  waterReset TINYINT(1) NOT NULL DEFAULT 0,
+  electricReset TINYINT(1) NOT NULL DEFAULT 0,
   recordDate DATE NOT NULL,
   month VARCHAR(20) NOT NULL,
   PRIMARY KEY (meterId),
@@ -133,7 +138,11 @@ CREATE TABLE IF NOT EXISTS MeterRecord (
   KEY idx_meter_month (month),
   CONSTRAINT fk_meter_room FOREIGN KEY (roomId) REFERENCES Room (roomId),
   CONSTRAINT chk_meter_water CHECK (waterUnit >= 0),
-  CONSTRAINT chk_meter_electric CHECK (electricUnit >= 0)
+  CONSTRAINT chk_meter_electric CHECK (electricUnit >= 0),
+  CONSTRAINT chk_meter_water_reading CHECK (waterReading IS NULL OR waterReading >= 0),
+  CONSTRAINT chk_meter_electric_reading CHECK (electricReading IS NULL OR electricReading >= 0),
+  CONSTRAINT chk_meter_water_reset CHECK (waterReset IN (0, 1)),
+  CONSTRAINT chk_meter_electric_reset CHECK (electricReset IN (0, 1))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS Repair (

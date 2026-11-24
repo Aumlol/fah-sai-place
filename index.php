@@ -71,7 +71,8 @@ if ($page === 'invoice_meter') {
         exit;
     }
 
-    $invoice['meterAvailable'] = $invoice['waterUnit'] !== null && $invoice['electricUnit'] !== null;
+    $invoice['meterFound'] = $invoice['waterUnit'] !== null && $invoice['electricUnit'] !== null;
+    $invoice['meterAvailable'] = $invoice['meterFound'];
     $invoice['invoiceExists'] = (bool) $invoice['invoiceExists'];
     $invoice['waterRate'] = WATER_RATE;
     $invoice['electricRate'] = ELECTRIC_RATE;
