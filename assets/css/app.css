@@ -308,10 +308,14 @@ td{font-size:13px;color:#35546a}
 .password-toggle:hover{background:#deeff8}
 .meter-previous{margin:13px 0 0;padding:10px 12px;border:1px solid #e6eff4;border-radius:7px;background:#f8fcfe;color:#5f7c8f;font-size:11px}
 .meter-batch-form{display:grid;gap:14px}
+<<<<<<< HEAD
 .meter-month-picker{max-width:360px;display:grid;gap:6px;font-size:10px;font-weight:600;color:#6b8495}
 .meter-month-controls{display:flex;align-items:center;gap:8px}
 .meter-month-controls select{width:230px;height:39px;border:1px solid #e0eaf0;border-radius:6px;background:#fff;padding:0 10px;color:#294a60;font-size:11px;outline:0}
 .meter-month-controls .button{height:39px;white-space:nowrap}
+=======
+.meter-month-field{max-width:230px}
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 .meter-batch-table{border:1px solid #e2edf4;border-radius:10px}
 .meter-batch-table table{min-width:900px}
 .meter-batch-table th{white-space:nowrap}
@@ -319,6 +323,7 @@ td{font-size:13px;color:#35546a}
 .meter-row-saved .meter-reading-input:disabled{border-color:#dbe8f0;background:#eaf2f7;color:#49677a;cursor:not-allowed}
 .meter-row-saved .meter-reset-option{color:#8aa0ae}
 .meter-reading-input{width:128px;min-width:100px;padding:9px 10px}
+<<<<<<< HEAD
 .meter-reading-entry{display:grid;grid-template-columns:minmax(0,1fr) minmax(118px,150px);align-items:center;gap:8px}
 .meter-reading-input{height:42px;font-size:13px;font-weight:600}
 .meter-reading-before{color:#718595;font-size:11px;white-space:nowrap}
@@ -328,6 +333,11 @@ td{font-size:13px;color:#35546a}
 .meter-reading-field-water .meter-reading-input{border:1px solid #8acbe3;background:#eff9fd}
 .meter-reading-field-electric{color:#986516}
 .meter-reading-field-electric .meter-reading-input{border:1px solid #e5bf72;background:#fff9eb}
+=======
+.meter-reading-entry{display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,128px);align-items:center;gap:6px}
+.meter-reading-before{color:#718595;font-size:11px;white-space:nowrap}
+.meter-reading-entry .meter-reading-input{width:100%;min-width:0}
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 .meter-reading-entry .meter-reset-option{grid-column:1/-1;margin-top:0}
 .meter-batch-tools{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .meter-batch-tools label{display:flex;align-items:center;gap:10px;color:#49677a;font-size:12px;font-weight:700}
@@ -338,6 +348,7 @@ td{font-size:13px;color:#35546a}
 .meter-reset-option{display:flex;align-items:center;gap:5px;margin-top:6px;color:#718595;font-size:10px;white-space:nowrap}
 .meter-reset-option input[type="checkbox"]{width:auto;margin:0}
 .meter-batch-actions{display:flex;align-items:center;justify-content:space-between;gap:18px}
+<<<<<<< HEAD
 .meter-batch-actions .form-hint{margin:0;max-width:680px;font-size:12px;line-height:1.6;color:#5f7788}
 .meter-batch-table th{font-size:11px;color:#607d90}
 .meter-batch-table td{font-size:12px}
@@ -357,6 +368,10 @@ thead .meter-select-column{cursor:pointer}
 [data-meter-history-form] tbody tr.is-selected>td{background:#e1f1fa}
 [data-meter-history-form] tbody tr.is-selected>td:first-child{box-shadow:inset 3px 0 #398bb5}
 .meter-history-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 24px;border-top:1px solid #edf2f5;color:#7b94a3;font-size:11px}
+=======
+.meter-batch-actions .form-hint{margin:0;max-width:680px}
+.meter-batch-actions .button{flex:0 0 auto}
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 .room-assignment-fields{padding:12px;border:1px solid #e6eff4;border-radius:8px;background:#f8fcfe}
 .room-assignment-fields[hidden]{display:none}
 .password-strength{display:grid;gap:9px}
@@ -1920,6 +1935,7 @@ input[type="file"]::file-selector-button {
 input[type="file"]::file-selector-button:hover {
   background: #bae6fd;
 }
+<<<<<<< HEAD
 
 /* ===== หน้า ผู้เช่าและสัญญา (รายการแบบแถวการ์ด) ===== */
 .tn-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
@@ -2209,3 +2225,5 @@ input[type="file"]::file-selector-button:hover {
   .repair-ticket-meta-item strong{font-size:14px}
   .repair-ticket-photo-link{flex:1 1 100%}
 }
+=======
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c

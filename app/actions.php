@@ -578,12 +578,23 @@ try {
                     continue;
                 }
 
+<<<<<<< HEAD
                 $previous = $previousReadings[$roomId] ?? null;
                 $previousWater = $previous ? (float) $previous['waterReading'] : 0.0;
                 $previousElectric = $previous ? (float) $previous['electricReading'] : 0.0;
                 if ($waterReading < $previousWater || $electricReading < $previousElectric) {
                     $previousMonth = $previous['month'] ?? 'ค่าเริ่มต้น 0';
                     $problems[] = "ห้อง {$roomId}: เลขมิเตอร์ต่ำกว่างวดก่อน {$previousMonth} กรุณาตรวจสอบอีกครั้ง";
+=======
+                $waterReset = ($values['waterReset'] ?? '') === '1';
+                $electricReset = ($values['electricReset'] ?? '') === '1';
+                $previous = $previousReadings[$roomId] ?? null;
+                $previousWater = $previous ? (float) $previous['waterReading'] : 0.0;
+                $previousElectric = $previous ? (float) $previous['electricReading'] : 0.0;
+                if (($waterReading < $previousWater && !$waterReset) || ($electricReading < $previousElectric && !$electricReset)) {
+                    $previousMonth = $previous['month'] ?? 'ค่าเริ่มต้น 0';
+                    $problems[] = "ห้อง {$roomId}: เลขสะสมลดลงจากงวด {$previousMonth} กรุณายืนยันการเปลี่ยนมิเตอร์";
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                     continue;
                 }
 
@@ -591,8 +602,15 @@ try {
                     'roomId' => $roomId,
                     'waterReading' => $waterReading,
                     'electricReading' => $electricReading,
+<<<<<<< HEAD
                     'waterUnit' => round($waterReading - $previousWater, 2),
                     'electricUnit' => round($electricReading - $previousElectric, 2),
+=======
+                    'waterUnit' => round($waterReset ? $waterReading : $waterReading - $previousWater, 2),
+                    'electricUnit' => round($electricReset ? $electricReading : $electricReading - $previousElectric, 2),
+                    'waterReset' => $waterReset ? 1 : 0,
+                    'electricReset' => $electricReset ? 1 : 0,
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                 ];
             }
 
@@ -616,8 +634,13 @@ try {
                         $entry['electricUnit'],
                         $entry['waterReading'],
                         $entry['electricReading'],
+<<<<<<< HEAD
                         0,
                         0,
+=======
+                        $entry['waterReset'],
+                        $entry['electricReset'],
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                     ]);
                 }
                 $connection->commit();
@@ -649,6 +672,11 @@ try {
             }
             $waterReading = (float) $waterRaw;
             $electricReading = (float) $electricRaw;
+<<<<<<< HEAD
+=======
+            $waterReset = ($_POST['waterReset'] ?? '') === '1';
+            $electricReset = ($_POST['electricReset'] ?? '') === '1';
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             if (!is_finite($waterReading) || !is_finite($electricReading) || $waterReading > 99999999.99 || $electricReading > 99999999.99) {
                 throw new RuntimeException('เลขมิเตอร์เกินขอบเขตที่รองรับ');
             }
@@ -657,11 +685,19 @@ try {
             $previous = $previousReadings[$roomId] ?? null;
             $previousWater = $previous ? (float) $previous['waterReading'] : 0.0;
             $previousElectric = $previous ? (float) $previous['electricReading'] : 0.0;
+<<<<<<< HEAD
             if ($waterReading < $previousWater || $electricReading < $previousElectric) {
                 throw new RuntimeException('เลขมิเตอร์ต่ำกว่างวดก่อน กรุณาตรวจสอบอีกครั้ง');
             }
             $waterUnit = round($waterReading - $previousWater, 2);
             $electricUnit = round($electricReading - $previousElectric, 2);
+=======
+            if (($waterReading < $previousWater && !$waterReset) || ($electricReading < $previousElectric && !$electricReset)) {
+                throw new RuntimeException('เลขสะสมลดลงจากงวดก่อน กรุณายืนยันการเปลี่ยนมิเตอร์');
+            }
+            $waterUnit = round($waterReset ? $waterReading : $waterReading - $previousWater, 2);
+            $electricUnit = round($electricReset ? $electricReading : $electricReading - $previousElectric, 2);
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 
             $existingStatement = db()->prepare('SELECT roomId FROM MeterRecord WHERE meterId = ? FOR UPDATE');
             $existingStatement->execute([$meterId]);
@@ -680,7 +716,11 @@ try {
             $connection->beginTransaction();
             try {
                 $upd = $connection->prepare('UPDATE MeterRecord SET roomId = ?, month = ?, waterUnit = ?, electricUnit = ?, waterReading = ?, electricReading = ?, usageCalculated = 1, waterReset = ?, electricReset = ? WHERE meterId = ?');
+<<<<<<< HEAD
                 $upd->execute([$roomId, $month, $waterUnit, $electricUnit, $waterReading, $electricReading, 0, 0, $meterId]);
+=======
+                $upd->execute([$roomId, $month, $waterUnit, $electricUnit, $waterReading, $electricReading, $waterReset ? 1 : 0, $electricReset ? 1 : 0, $meterId]);
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 
                 $updInv = $connection->prepare(
                     "UPDATE Invoice invoice
@@ -806,7 +846,13 @@ try {
             $contractId = trim((string) ($_POST['contractId'] ?? ''));
             $billMonthRaw = trim((string) ($_POST['billMonth'] ?? ''));
             $billMonth = normalize_billing_month($billMonthRaw);
+<<<<<<< HEAD
             if ($contractId === '' || $billMonth === null) {
+=======
+            $dueDate = trim((string) ($_POST['dueDate'] ?? ''));
+
+            if ($contractId === '' || $billMonth === null || $dueDate === '') {
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                 throw new RuntimeException('กรุณากรอกข้อมูลใบแจ้งหนี้ให้ครบถ้วน');
             }
             $dueDate = billing_due_date($billMonth);
@@ -1033,12 +1079,17 @@ try {
             if ($assigned->rowCount() !== 1) {
                 throw new RuntimeException('มีผู้มอบหมายช่างให้งานนี้แล้ว กรุณาตรวจสอบอีกครั้ง');
             }
+<<<<<<< HEAD
             flash('มอบหมายช่างแล้ว · ช่างจะประเมินราคาและส่งให้ Staff ตรวจสอบก่อน', 'success');
+=======
+            flash('มอบหมายงานให้ช่างซ่อมแล้ว ช่างสามารถส่งรายการราคาให้ Staff ตรวจสอบได้', 'success');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             break;
 
         case 'save_repair_cost':
             $currentUser = require_role(['Technician']);
             $repairId = trim((string) ($_POST['repairId'] ?? ''));
+<<<<<<< HEAD
             $quoteNote = trim((string) ($_POST['quoteNote'] ?? ''));
             $costRows = $_POST['costs'] ?? [];
             if ($repairId === '' || !is_array($costRows)) {
@@ -1046,6 +1097,11 @@ try {
             }
             if (mb_strlen($quoteNote) > 500) {
                 throw new RuntimeException('หมายเหตุการประเมินต้องไม่เกิน 500 ตัวอักษร');
+=======
+            $costRows = $_POST['costs'] ?? [];
+            if ($repairId === '' || !is_array($costRows)) {
+                throw new RuntimeException('กรุณาตรวจสอบข้อมูลการประเมินค่าซ่อม');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             }
 
             $costTypes = db()->query('SELECT costTypeId, costTypeName FROM CostType')->fetchAll();
@@ -1078,7 +1134,11 @@ try {
                 ];
             }
             if ($entries === []) {
+<<<<<<< HEAD
                 throw new RuntimeException('กรุณากรอกรายการค่าใช้จ่ายอย่างน้อยหนึ่งประเภทก่อนส่งให้ Staff ตรวจสอบ');
+=======
+                throw new RuntimeException('กรุณากรอกค่าใช้จ่ายอย่างน้อยหนึ่งประเภทก่อนส่งเสนอราคา');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             }
 
             $connection = db();
@@ -1087,6 +1147,7 @@ try {
                 $repairStmt = $connection->prepare('SELECT maintenanceUserId, repairStatus FROM Repair WHERE repairId = ? FOR UPDATE');
                 $repairStmt->execute([$repairId]);
                 $repair = $repairStmt->fetch();
+<<<<<<< HEAD
                 if (!$repair) {
                     throw new RuntimeException('ไม่พบรายการแจ้งซ่อม');
                 }
@@ -1095,10 +1156,18 @@ try {
                 }
                 if (!in_array($repair['repairStatus'], ['มอบหมายช่างแล้ว', 'รอแก้ไขค่าใช้จ่าย', 'รอ Staff แก้ไขข้อมูล'], true)) {
                     throw new RuntimeException('งานซ่อมนี้ไม่อยู่ในสถานะที่ช่างสามารถประเมินราคาได้');
+=======
+                if (!$repair || $repair['maintenanceUserId'] !== $currentUser['userId']) {
+                    throw new RuntimeException('คุณไม่มีสิทธิ์เสนอราคาสำหรับงานซ่อมนี้');
+                }
+                if (!in_array($repair['repairStatus'], ['มอบหมายช่างแล้ว', 'รอแก้ไขค่าใช้จ่าย'], true)) {
+                    throw new RuntimeException('งานซ่อมนี้ไม่อยู่ในสถานะที่ช่างสามารถเสนอราคาได้');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                 }
 
                 $connection->prepare('DELETE FROM RepairDetail WHERE repairId = ?')->execute([$repairId]);
                 $insert = $connection->prepare('INSERT INTO RepairDetail (repairId, costTypeId, equipment, amount) VALUES (?, ?, ?, ?)');
+<<<<<<< HEAD
                 $total = 0.0;
                 foreach ($entries as $entry) {
                     $insert->execute([$repairId, $entry['costTypeId'], $entry['equipment'], $entry['amount']]);
@@ -1109,6 +1178,12 @@ try {
                      SET quoteAmount = ?, quoteNote = ?, repairStatus = 'รอ Staff ตรวจสอบราคา'
                      WHERE repairId = ?"
                 )->execute([$total, $quoteNote !== '' ? $quoteNote : null, $repairId]);
+=======
+                foreach ($entries as $entry) {
+                    $insert->execute([$repairId, $entry['costTypeId'], $entry['equipment'], $entry['amount']]);
+                }
+                $connection->prepare("UPDATE Repair SET repairStatus = 'รอ Staff ตรวจสอบราคา' WHERE repairId = ?")->execute([$repairId]);
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                 $connection->commit();
             } catch (Throwable $exception) {
                 if ($connection->inTransaction()) {
@@ -1116,12 +1191,17 @@ try {
                 }
                 throw $exception;
             }
+<<<<<<< HEAD
             flash('ส่งราคาประเมินให้ Staff ตรวจสอบเรียบร้อยแล้ว', 'success');
+=======
+            flash('ส่งรายการประเมินค่าซ่อมให้ Staff ตรวจสอบเรียบร้อยแล้ว', 'success');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             break;
 
         case 'submit_repair_quote':
             require_role(['Staff']);
             $repairId = trim((string) ($_POST['repairId'] ?? ''));
+<<<<<<< HEAD
             $updated = db()->prepare(
                 "UPDATE Repair
                  SET repairStatus = 'รออนุมัติค่าใช้จ่าย'
@@ -1135,6 +1215,12 @@ try {
             $updated->execute([$repairId, $repairId]);
             if ($updated->rowCount() !== 1) {
                 throw new RuntimeException('ต้องมีช่างผู้รับผิดชอบและรายการประเมินก่อนส่งราคาให้ Admin');
+=======
+            $updated = db()->prepare("UPDATE Repair SET repairStatus = 'รออนุมัติค่าใช้จ่าย' WHERE repairId = ? AND repairStatus = 'รอ Staff ตรวจสอบราคา' AND EXISTS (SELECT 1 FROM RepairDetail WHERE repairId = ?)");
+            $updated->execute([$repairId, $repairId]);
+            if ($updated->rowCount() !== 1) {
+                throw new RuntimeException('ไม่พบรายการราคาที่รอ Staff ตรวจสอบ หรือไม่มีรายการค่าใช้จ่าย');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             }
             flash('ส่งราคาที่ช่างเสนอให้ Admin อนุมัติเรียบร้อยแล้ว', 'success');
             break;
@@ -1147,12 +1233,17 @@ try {
             if ($updated->rowCount() !== 1) {
                 throw new RuntimeException('งานซ่อมนี้ไม่มีรายการราคาที่ส่งกลับให้ช่างแก้ไขได้');
             }
+<<<<<<< HEAD
             flash('ส่งรายการกลับให้ช่างแก้ไขราคาแล้ว', 'success');
+=======
+            flash('ส่งรายการราคากลับให้ช่างแก้ไขแล้ว', 'success');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             break;
 
         case 'approve_repair_cost':
             require_role(['Admin']);
             $repairId = trim((string) ($_POST['repairId'] ?? ''));
+<<<<<<< HEAD
             $repairStmt = db()->prepare('SELECT repairStatus, maintenanceUserId FROM Repair WHERE repairId = ? LIMIT 1');
             $repairStmt->execute([$repairId]);
             $repair = $repairStmt->fetch();
@@ -1167,6 +1258,13 @@ try {
             if ((int) $technician->fetchColumn() !== 1) {
                 throw new RuntimeException('ช่างผู้รับผิดชอบไม่ถูกต้อง กรุณาส่งรายการกลับให้ Staff ตรวจสอบ');
             }
+=======
+            $repairStmt = db()->prepare('SELECT repairStatus FROM Repair WHERE repairId = ? LIMIT 1');
+            $repairStmt->execute([$repairId]);
+            if ($repairStmt->fetchColumn() !== 'รออนุมัติค่าใช้จ่าย') {
+                throw new RuntimeException('งานซ่อมนี้ไม่มีรายการประเมินที่รออนุมัติ');
+            }
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             $costCount = db()->prepare('SELECT COUNT(*) FROM RepairDetail WHERE repairId = ?');
             $costCount->execute([$repairId]);
             if ((int) $costCount->fetchColumn() === 0) {
@@ -1188,7 +1286,11 @@ try {
             if ($updated->rowCount() !== 1) {
                 throw new RuntimeException('งานซ่อมนี้ไม่มีรายการประเมินที่ส่งกลับแก้ไขได้');
             }
+<<<<<<< HEAD
             flash('ส่งรายการประเมินกลับให้ช่างปรับราคาแล้ว รอช่างส่งให้ Staff ตรวจสอบอีกครั้ง', 'success');
+=======
+            flash('ส่งรายการประเมินกลับให้ช่างแก้ไขแล้ว', 'success');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             break;
 
         case 'update_repair':
@@ -1220,9 +1322,12 @@ try {
             if (($completionUpload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
                 $completionImage = upload_image($completionUpload, 'repairs');
             }
+<<<<<<< HEAD
             if ($repairStatus === 'ซ่อมเสร็จแล้ว' && $completionImage === null) {
                 throw new RuntimeException('ก่อนปิดงานซ่อม กรุณาแนบรูปหลังซ่อม');
             }
+=======
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 
             db()->prepare('UPDATE Repair SET repairStatus = ?, repairResult = ?, completionImage = ? WHERE repairId = ?')->execute([$repairStatus, $repairResult, $completionImage, $repairId]);
             flash('บันทึกผลการซ่อมเรียบร้อยแล้ว', 'success');
@@ -1272,8 +1377,12 @@ try {
 
 $targetPage = ($action === 'login') ? 'login' : $returnPage;
 if ($targetPage === 'meters' && $returnMonth !== null) {
+<<<<<<< HEAD
     $returnScroll = max(0, (int) ($_POST['return_scroll'] ?? 0));
     header('Location: index.php?page=meters&month=' . rawurlencode($returnMonth) . '&scrollY=' . $returnScroll);
+=======
+    header('Location: index.php?page=meters&month=' . rawurlencode($returnMonth));
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
     exit;
 }
 redirect($targetPage);

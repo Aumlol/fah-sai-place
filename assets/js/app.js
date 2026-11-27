@@ -384,6 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
       maximumFractionDigits: 2,
     });
 
+<<<<<<< HEAD
     const updateTotal = () => {
       const amountSum = amounts.reduce((sum, input) => {
         const amount = Number(input.value);
@@ -392,6 +393,25 @@ document.addEventListener('DOMContentLoaded', () => {
       total.textContent = formatCurrency.format(amountSum);
     };
 
+=======
+  const meterBatchForm = document.querySelector('[data-meter-batch-form]');
+  document.querySelectorAll('[data-repair-cost-form]').forEach((form) => {
+    const amounts = Array.from(form.querySelectorAll('[data-repair-cost-amount]'));
+    const total = form.querySelector('[data-repair-cost-total]');
+    const formatCurrency = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    const updateTotal = () => {
+      const amountSum = amounts.reduce((sum, input) => {
+        const amount = Number(input.value);
+        return sum + (Number.isFinite(amount) && amount > 0 ? amount : 0);
+      }, 0);
+      total.textContent = formatCurrency.format(amountSum);
+    };
+
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
     amounts.forEach((input) => {
       input.addEventListener('input', updateTotal);
       input.addEventListener('change', updateTotal);
@@ -404,9 +424,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const meterFilter = meterBatchForm.querySelector('[data-meter-filter]');
     const meterCount = meterBatchForm.querySelector('[data-meter-count]');
     const meterMonthInput = meterBatchForm.querySelector('[data-meter-month]');
+<<<<<<< HEAD
     const meterMonthValue = meterBatchForm.querySelector('[data-meter-month-value]');
     const meterSearchButton = meterBatchForm.querySelector('[data-meter-search]');
     const meterReturnScroll = meterBatchForm.querySelector('[data-meter-return-scroll]');
+=======
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
     const loadedMonth = meterMonthInput.value.trim();
     let monthNavigationStarted = false;
     const formatMeterUsage = value => new Intl.NumberFormat('en-US', {
@@ -417,6 +440,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateMeterUsage = (row) => {
       const waterInput = row.querySelector('[name$="[waterReading]"]');
       const electricInput = row.querySelector('[name$="[electricReading]"]');
+<<<<<<< HEAD
+=======
+      const waterReset = row.querySelector('[name$="[waterReset]"]');
+      const electricReset = row.querySelector('[name$="[electricReset]"]');
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
       const waterUsed = row.querySelector('[data-water-used]');
       const electricUsed = row.querySelector('[data-electric-used]');
       const status = row.querySelector('[data-meter-status]');
@@ -431,13 +459,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+<<<<<<< HEAD
       const updateReading = (input, output, previous) => {
+=======
+      const updateReading = (input, reset, output, previous) => {
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
         input.setCustomValidity('');
         if (input.value === '') {
           output.textContent = '—';
           return 'empty';
         }
         const current = Number(input.value);
+<<<<<<< HEAD
         if (!Number.isFinite(current) || current < previous) {
           input.setCustomValidity('เลขมิเตอร์ต่ำกว่างวดก่อน กรุณาตรวจสอบอีกครั้ง');
           output.textContent = 'ตรวจสอบเลข';
@@ -449,6 +482,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const waterState = updateReading(waterInput, waterUsed, Number(row.dataset.previousWater));
       const electricState = updateReading(electricInput, electricUsed, Number(row.dataset.previousElectric));
+=======
+        if (!Number.isFinite(current) || (current < previous && !reset.checked)) {
+          input.setCustomValidity('เลขมิเตอร์ต่ำกว่ายอดครั้งก่อน หากเปลี่ยน/รีเซ็ตมิเตอร์ให้ติ๊กยืนยัน');
+          output.textContent = 'ตรวจสอบเลข';
+          return 'invalid';
+        }
+        output.textContent = formatMeterUsage(reset.checked ? current : current - previous);
+        return 'valid';
+      };
+
+      const waterState = updateReading(waterInput, waterReset, waterUsed, Number(row.dataset.previousWater));
+      const electricState = updateReading(electricInput, electricReset, electricUsed, Number(row.dataset.previousElectric));
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
       const hasError = waterState === 'invalid' || electricState === 'invalid';
       const isComplete = waterState === 'valid' && electricState === 'valid' && !hasError;
 
@@ -487,7 +533,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     meterRows.forEach((row) => {
+<<<<<<< HEAD
       row.querySelectorAll('.meter-reading-input').forEach((input) => {
+=======
+      row.querySelectorAll('.meter-reading-input, .meter-reset-input').forEach((input) => {
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
         input.addEventListener('input', () => handleMeterInput(row));
         input.addEventListener('change', () => handleMeterInput(row));
         input.addEventListener('keydown', (event) => {
@@ -515,7 +565,10 @@ document.addEventListener('DOMContentLoaded', () => {
         meterMonthInput.reportValidity();
         return true;
       }
+<<<<<<< HEAD
       if (meterMonthValue) meterMonthValue.value = month;
+=======
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 
       const hasUnsavedReadings = meterRows.some((row) => (
         row.dataset.persisted !== '1'
@@ -534,6 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return true;
     };
 
+<<<<<<< HEAD
     meterSearchButton?.addEventListener('click', switchMeterMonth);
     meterMonthInput?.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
@@ -544,6 +598,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     meterBatchForm.addEventListener('submit', (event) => {
       if (meterReturnScroll) meterReturnScroll.value = String(window.scrollY || window.pageYOffset || 0);
+=======
+    meterMonthInput.addEventListener('change', switchMeterMonth);
+
+    meterBatchForm.addEventListener('submit', (event) => {
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
       if (switchMeterMonth()) {
         event.preventDefault();
         return;

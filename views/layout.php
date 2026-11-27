@@ -1241,8 +1241,13 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
         <section class="panel table-panel"><div class="table-toolbar"><div class="search-box"><span>⌕</span><input type="search" placeholder="ค้นหาชื่อหรือ Username..." data-table-search></div><span class="panel-caption"><?= count($accounts) ?> บัญชี</span></div><div class="table-scroll"><table><thead><tr><th>ชื่อผู้ใช้งาน</th><th>Username</th><th>เบอร์โทรศัพท์</th><th>อีเมล</th><th>บทบาท</th><th>ปรับสิทธิ์</th><th></th></tr></thead><tbody><?php foreach ($accounts as $account): ?><tr data-search-row><td><strong><?= e($account['name']) ?></strong></td><td class="mono"><?= e($account['username']) ?></td><td><?= e($account['phone']) ?></td><td><?= e($account['email']) ?></td><td><span class="status-pill <?= $account['role'] === 'Admin' ? 'occupied' : 'available' ?>"><?= e($account['role']) ?></span></td><td><form method="post" action="index.php" class="role-form"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="update_user_role"><input type="hidden" name="userId" value="<?= e($account['userId']) ?>"><input type="hidden" name="return_page" value="users"><select name="role"><option <?= $account['role'] === 'Tenant' ? 'selected' : '' ?>>Tenant</option><option <?= $account['role'] === 'Staff' ? 'selected' : '' ?>>Staff</option><option <?= $account['role'] === 'Technician' ? 'selected' : '' ?>>Technician</option><option <?= $account['role'] === 'Admin' ? 'selected' : '' ?>>Admin</option></select><button class="button tiny secondary" type="submit">บันทึก</button></form></td><td class="row-actions"><button class="icon-button" type="button" data-edit-account data-account="<?= e(json_encode($account, JSON_HEX_APOS | JSON_HEX_QUOT)) ?>" aria-label="แก้ไขบัญชี">✎</button><?php if ($account['userId'] !== $user['userId']): ?><form method="post" action="index.php"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="delete_user"><input type="hidden" name="userId" value="<?= e($account['userId']) ?>"><input type="hidden" name="return_page" value="users"><button class="icon-button danger-icon" type="submit" data-confirm="ลบบัญชีนี้หรือไม่?" aria-label="ลบบัญชี">×</button></form><?php endif; ?></td></tr><?php endforeach; ?></tbody></table></div></section>
         <dialog class="modal account-modal" id="user-modal" style="max-width: 720px; width: 96%;"><form method="post" action="index.php" class="modal-form account-form"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="save_user"><input type="hidden" name="userId"><input type="hidden" name="return_page" value="users">
           <div class="modal-heading"><div><p class="eyebrow">ACCOUNT DETAILS</p><h2>เพิ่มบัญชีผู้ใช้งาน</h2><p class="muted">กรอกข้อมูลบัญชีและประวัติผู้ใช้งานให้ครบถ้วน</p></div><button class="icon-button" type="button" data-modal-close aria-label="ปิด">×</button></div>
+<<<<<<< HEAD
           <section class="account-section"><h3>ข้อมูลบัญชีและข้อมูลส่วนตัว</h3><div class="form-row"><label class="required-field"><span>ชื่อ-นามสกุล <span class="required-mark" aria-hidden="true">*</span></span><input name="name" maxlength="100" autocomplete="name" placeholder="เช่น นายสมชาย ใจดี" required></label><label class="required-field"><span>Username <span class="required-mark" aria-hidden="true">*</span></span><input name="username" maxlength="50" autocomplete="username" placeholder="เช่น somchai01" required></label></div>
             <div class="form-row"><label class="required-field"><span>เบอร์โทรศัพท์ <span class="required-mark" aria-hidden="true">*</span></span><input name="phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="tel" placeholder="เช่น 0812345678" required></label><label class="required-field"><span>อีเมล <span class="required-mark" aria-hidden="true">*</span></span><input type="email" name="email" maxlength="100" autocomplete="email" placeholder="เช่น somchai@email.com" required></label></div>
+=======
+          <section class="account-section"><h3>ข้อมูลบัญชีและข้อมูลส่วนตัว</h3><div class="form-row"><label class="required-field"><span>ชื่อ-นามสกุล <span class="required-mark" aria-hidden="true">*</span></span><input name="name" maxlength="100" autocomplete="name" required></label><label class="required-field"><span>Username <span class="required-mark" aria-hidden="true">*</span></span><input name="username" maxlength="50" autocomplete="username" required></label></div>
+            <div class="form-row"><label class="required-field"><span>เบอร์โทรศัพท์ <span class="required-mark" aria-hidden="true">*</span></span><input name="phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="tel" required></label><label class="required-field"><span>อีเมล <span class="required-mark" aria-hidden="true">*</span></span><input type="email" name="email" maxlength="100" autocomplete="email" required></label></div>
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             <div class="form-row"><label><span>เลขบัตรประชาชน (13 หลัก)</span><input name="idCardNumber" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" placeholder="เช่น 1509901234567"></label><label><span>วันเดือนปีเกิด</span><input type="date" name="birthDate"></label></div>
             <div class="form-row"><label class="required-field"><span>บทบาท <span class="required-mark" aria-hidden="true">*</span></span><select name="role" required><option>Tenant</option><option>Staff</option><option>Technician</option><option>Admin</option></select></label></div>
           </section>
@@ -1271,6 +1276,7 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
         <?php 
         $meters = db()->query('SELECT m.*, r.roomNumber FROM MeterRecord m JOIN Room r ON r.roomId = m.roomId ORDER BY m.recordDate DESC, r.roomNumber LIMIT 100')->fetchAll(); 
         $allRooms = db()->query('SELECT roomId, roomNumber FROM Room ORDER BY roomNumber')->fetchAll(); 
+<<<<<<< HEAD
         $meterHistoryMonth = normalize_billing_month((string) ($_GET['historyMonth'] ?? ''));
         $availableMeterMonths = db()->query('SELECT DISTINCT month FROM MeterRecord')->fetchAll(PDO::FETCH_COLUMN);
         $normalizedAvailableMeterMonths = [];
@@ -1309,6 +1315,11 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
             $monthNumber = (($monthIndex - 1) % 12) + 1;
             $meterMonthOptions[sprintf('%02d/%04d', $monthNumber, $year)] = true;
         }
+=======
+        $meterTargetMonth = normalize_billing_month((string) ($_GET['month'] ?? '')) ?? (date('m/') . (date('Y') + 543));
+        $meterTargetIndex = billing_month_index($meterTargetMonth);
+        $meterTargetVariants = billing_month_variants($meterTargetMonth);
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
         $lastMeterRows = db()->query('SELECT roomId, month, waterUnit, electricUnit, waterReading, electricReading, usageCalculated, waterReset, electricReset, recordDate FROM MeterRecord')->fetchAll();
         $lastMetersByRoom = [];
         $metersForTargetMonth = [];
@@ -1327,6 +1338,7 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
         $pendingMeterRoomCount = max(0, count($allRooms) - count($metersForTargetMonth));
         $defaultMeterTab = isset($_GET['historyMonth']) ? 'history' : 'record';
         ?>
+<<<<<<< HEAD
 
         <style>
         .meter-nav-grid {
@@ -1442,6 +1454,95 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
             <p class="eyebrow">UTILITY READINGS</p>
             <h1>บันทึกมิเตอร์</h1>
             <p class="muted">กรอกเลขมิเตอร์สะสมประจำเดือนของทุกห้อง หรือตรวจสอบและแก้ไขประวัติย้อนหลัง</p>
+=======
+        <section class="page-heading"><div><p class="eyebrow">UTILITY READINGS</p><h1>บันทึกมิเตอร์</h1><p class="muted">กรอกเลขมิเตอร์สะสมของทุกห้องในหน้าเดียว ระบบคำนวณหน่วยที่ใช้ให้อัตโนมัติ</p></div></section>
+        <section class="panel form-panel">
+          <div class="panel-heading"><div><p class="eyebrow">MONTHLY METER READINGS</p><h2>บันทึกเลขมิเตอร์ประจำเดือน</h2></div><span class="panel-caption"><?= count($allRooms) ?> ห้อง</span></div>
+          <form method="post" action="index.php" class="meter-batch-form" data-meter-batch-form>
+            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+            <input type="hidden" name="action" value="save_meter_batch">
+            <input type="hidden" name="return_page" value="meters">
+            <input type="hidden" name="return_month" value="<?= e($meterTargetMonth) ?>">
+            <label class="meter-month-field">เดือน/ปี (MM/YYYY)<input name="month" required maxlength="20" value="<?= e($meterTargetMonth) ?>" placeholder="เช่น 10/2569" data-meter-month></label>
+            <div class="meter-batch-tools">
+              <label>แสดงห้อง
+                <select data-meter-filter aria-label="กรองห้องตามสถานะการกรอก">
+                  <option value="all">ทุกห้อง</option>
+                  <option value="pending">ยังไม่ครบ</option>
+                  <option value="complete">กรอกครบแล้ว</option>
+                </select>
+              </label>
+              <p class="form-hint" data-meter-count aria-live="polite"></p>
+            </div>
+            <div class="meter-batch-table table-scroll">
+              <table>
+                <thead><tr><th>ห้อง</th><th>งวดก่อน</th><th>มิเตอร์น้ำ (เดิม → ปัจจุบัน)</th><th>ส่วนต่างน้ำ</th><th>มิเตอร์ไฟ (เดิม → ปัจจุบัน)</th><th>ส่วนต่างไฟ</th></tr></thead>
+                <tbody>
+                  <?php foreach ($allRooms as $room):
+                    $lastMeter = $lastMetersByRoom[$room['roomId']] ?? null;
+                    $existingMeter = $metersForTargetMonth[$room['roomId']] ?? null;
+                    $lastWater = (float) ($lastMeter['waterReading'] ?? 0);
+                    $lastElectric = (float) ($lastMeter['electricReading'] ?? 0);
+                    $currentWater = $existingMeter ? (float) ($existingMeter['waterReading'] ?? $existingMeter['waterUnit']) : null;
+                    $currentElectric = $existingMeter ? (float) ($existingMeter['electricReading'] ?? $existingMeter['electricUnit']) : null;
+                    ?>
+                    <tr data-meter-row class="<?= $existingMeter ? 'meter-row-saved' : '' ?>" data-persisted="<?= $existingMeter ? '1' : '0' ?>" data-saved-water-used="<?= e((string) ($existingMeter['waterUnit'] ?? '')) ?>" data-saved-electric-used="<?= e((string) ($existingMeter['electricUnit'] ?? '')) ?>" data-saved-usage-calculated="<?= e((string) ($existingMeter['usageCalculated'] ?? '1')) ?>" data-previous-water="<?= e((string) $lastWater) ?>" data-previous-electric="<?= e((string) $lastElectric) ?>">
+                      <td data-label="ห้อง"><strong><?= e($room['roomNumber']) ?></strong><small class="meter-row-status" data-meter-status>ยังไม่อ่าน</small></td>
+                      <td data-label="งวดก่อน"><?= $lastMeter ? e($lastMeter['month']) : 'เริ่มต้นที่ 0' ?></td>
+                      <td data-label="มิเตอร์น้ำ (เดิม → ปัจจุบัน)"><div class="meter-reading-entry"><span class="meter-reading-before"><?= meter_reading_display($lastWater) ?> →</span><input class="meter-reading-input" type="text" inputmode="decimal" pattern="[0-9]+([.][0-9]{1,2})?" maxlength="12" name="meters[<?= e($room['roomId']) ?>][waterReading]" value="<?= $currentWater !== null ? e(meter_reading_display($currentWater)) : '' ?>" aria-label="เลขมิเตอร์น้ำปัจจุบัน ห้อง <?= e($room['roomNumber']) ?>" <?= $existingMeter ? 'disabled' : '' ?>><label class="meter-reset-option"><input class="meter-reset-input" type="checkbox" name="meters[<?= e($room['roomId']) ?>][waterReset]" value="1" <?= !empty($existingMeter['waterReset']) ? 'checked' : '' ?> <?= $existingMeter ? 'disabled' : '' ?>> เปลี่ยน/รีเซ็ตมิเตอร์</label></div></td>
+                      <td data-label="ส่วนต่างน้ำ"><strong data-water-used><?= $existingMeter ? money($existingMeter['waterUnit']) . (empty($existingMeter['usageCalculated']) ? ' (ข้อมูลเดิม)' : '') : '—' ?></strong></td>
+                      <td data-label="มิเตอร์ไฟ (เดิม → ปัจจุบัน)"><div class="meter-reading-entry"><span class="meter-reading-before"><?= meter_reading_display($lastElectric) ?> →</span><input class="meter-reading-input" type="text" inputmode="decimal" pattern="[0-9]+([.][0-9]{1,2})?" maxlength="12" name="meters[<?= e($room['roomId']) ?>][electricReading]" value="<?= $currentElectric !== null ? e(meter_reading_display($currentElectric)) : '' ?>" aria-label="เลขมิเตอร์ไฟปัจจุบัน ห้อง <?= e($room['roomNumber']) ?>" <?= $existingMeter ? 'disabled' : '' ?>><label class="meter-reset-option"><input class="meter-reset-input" type="checkbox" name="meters[<?= e($room['roomId']) ?>][electricReset]" value="1" <?= !empty($existingMeter['electricReset']) ? 'checked' : '' ?> <?= $existingMeter ? 'disabled' : '' ?>> เปลี่ยน/รีเซ็ตมิเตอร์</label></div></td>
+                      <td data-label="ส่วนต่างไฟ"><strong data-electric-used><?= $existingMeter ? money($existingMeter['electricUnit']) . (empty($existingMeter['usageCalculated']) ? ' (ข้อมูลเดิม)' : '') : '—' ?></strong></td>
+                    </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+            <div class="meter-batch-actions"><p class="form-hint">กรอกเฉพาะเลขปัจจุบัน ระบบคำนวณส่วนต่างอัตโนมัติ เลขที่บันทึกแล้วของรอบนี้จะล็อกในตารางนี้ หากต้องแก้ให้ใช้ปุ่มแก้ไขในประวัติมิเตอร์ด้านล่าง</p><button class="button primary" type="submit">บันทึกมิเตอร์</button></div>
+          </form>
+        </section>
+        <section class="panel table-panel">
+          <div class="panel-heading" style="padding: 20px 24px 12px;"><div><p class="eyebrow">RECENT READINGS</p><h2>ประวัติมิเตอร์</h2></div></div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่บันทึก</th>
+                  <th>ห้อง</th>
+                  <th>เดือน</th>
+                  <th>ใช้น้ำรอบนี้</th>
+                  <th>ใช้ไฟรอบนี้</th>
+                  <th>ค่าน้ำ/ไฟโดยประมาณ</th>
+                  <?php if ($user['role'] === 'Admin'): ?><th>จัดการ</th><?php endif; ?>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($meters as $meter): ?>
+                  <tr>
+                    <td><?= e(thai_date($meter['recordDate'])) ?></td>
+                    <td><strong><?= e($meter['roomNumber']) ?></strong></td>
+                    <td><?= e($meter['month']) ?></td>
+                    <td><?= money($meter['waterUnit']) ?><?= empty($meter['usageCalculated']) ? ' (ข้อมูลเดิม)' : '' ?></td>
+                    <td><?= money($meter['electricUnit']) ?><?= empty($meter['usageCalculated']) ? ' (ข้อมูลเดิม)' : '' ?></td>
+                    <td><?= money(((float) $meter['waterUnit'] * WATER_RATE) + ((float) $meter['electricUnit'] * ELECTRIC_RATE)) ?> ฿</td>
+                    <?php if ($user['role'] === 'Admin'): ?>
+                      <td class="row-actions">
+                        <button class="icon-button" type="button" onclick='openEditMeterModal(<?= e(json_encode($meter, JSON_HEX_APOS | JSON_HEX_QUOT)) ?>)' aria-label="แก้ไขมิเตอร์" title="แก้ไขมิเตอร์">✎</button>
+                        <form method="post" action="index.php" style="display:inline;">
+                          <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                          <input type="hidden" name="action" value="delete_meter">
+                          <input type="hidden" name="meterId" value="<?= e($meter['meterId']) ?>">
+                          <input type="hidden" name="return_page" value="meters">
+                          <button class="icon-button danger-icon" type="submit" data-confirm="ยืนยันการลบข้อมูลมิเตอร์ห้อง <?= e($meter['roomNumber']) ?> เดือน <?= e($meter['month']) ?> หรือไม่?" aria-label="ลบมิเตอร์" title="ลบมิเตอร์">×</button>
+                        </form>
+                      </td>
+                    <?php endif; ?>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+            <?php if (!$meters): ?><div class="empty-state compact"><strong>ยังไม่มีรายการมิเตอร์</strong></div><?php endif; ?>
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
           </div>
         </section>
 
@@ -1663,6 +1764,13 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
                 <label>เลขมิเตอร์น้ำปัจจุบัน<input type="text" inputmode="decimal" pattern="[0-9]+([.][0-9]{1,2})?" maxlength="12" name="waterReading" id="edit-meter-water" required></label>
                 <label>เลขมิเตอร์ไฟปัจจุบัน<input type="text" inputmode="decimal" pattern="[0-9]+([.][0-9]{1,2})?" maxlength="12" name="electricReading" id="edit-meter-electric" required></label>
               </div>
+<<<<<<< HEAD
+=======
+              <div class="form-row">
+                <label class="meter-reset-option"><input type="checkbox" name="waterReset" value="1" id="edit-meter-water-reset"> เปลี่ยน/รีเซ็ตมิเตอร์น้ำ</label>
+                <label class="meter-reset-option"><input type="checkbox" name="electricReset" value="1" id="edit-meter-electric-reset"> เปลี่ยน/รีเซ็ตมิเตอร์ไฟ</label>
+              </div>
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
               <p class="form-hint">ระบบคำนวณหน่วยที่ใช้จากเลขสะสมงวดก่อนและอัปเดตใบแจ้งหนี้ที่ยังรอชำระ</p>
               <div class="modal-actions">
                 <button class="button secondary" type="button" data-modal-close>ยกเลิก</button>
@@ -1682,6 +1790,11 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
             document.getElementById('edit-meter-month').value = meter.month;
             document.getElementById('edit-meter-water').value = formatReading(meter.waterReading ?? meter.waterUnit);
             document.getElementById('edit-meter-electric').value = formatReading(meter.electricReading ?? meter.electricUnit);
+<<<<<<< HEAD
+=======
+            document.getElementById('edit-meter-water-reset').checked = Number(meter.waterReset) === 1;
+            document.getElementById('edit-meter-electric-reset').checked = Number(meter.electricReset) === 1;
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             document.getElementById('meter-edit-modal').showModal();
           }
           </script>
@@ -1691,6 +1804,7 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
         <?php require __DIR__ . '/payments.php'; ?>
 
       <?php elseif ($page === 'repairs'): ?>
+<<<<<<< HEAD
         <?php if ($user['role'] === 'Tenant'): $statement = db()->prepare('SELECT rp.*, r.roomNumber, tech.name AS technicianName FROM Repair rp JOIN Room r ON r.roomId = rp.roomId LEFT JOIN `User` tech ON tech.userId = rp.maintenanceUserId WHERE rp.userId = ? ORDER BY rp.repairDate DESC'); $statement->execute([$user['userId']]); $repairs = $statement->fetchAll(); $repairRooms = $tenantContract ? [['roomId' => $tenantContract['roomId'], 'roomNumber' => $tenantContract['roomNumber']]] : []; else: $query = "SELECT rp.*, u.name, r.roomNumber, tech.name AS technicianName FROM Repair rp JOIN `User` u ON u.userId = rp.userId JOIN Room r ON r.roomId = rp.roomId LEFT JOIN `User` tech ON tech.userId = rp.maintenanceUserId"; if ($user['role'] === 'Technician') { $statement = db()->prepare($query . ' WHERE rp.maintenanceUserId = ? ORDER BY rp.repairDate DESC'); $statement->execute([$user['userId']]); $repairs = $statement->fetchAll(); } else { $repairs = db()->query($query . ' ORDER BY rp.repairDate DESC')->fetchAll(); } $repairRooms = []; endif; $technicians = $user['role'] === 'Staff' ? db()->query("SELECT userId, name FROM `User` WHERE role = 'Technician' ORDER BY name")->fetchAll() : []; $repairCostTypes = $user['role'] === 'Technician' ? db()->query('SELECT costTypeId, costTypeName FROM CostType ORDER BY costTypeId')->fetchAll() : []; ?>
         <section class="page-heading maintenance-heading"><div><p class="eyebrow">MAINTENANCE DESK</p><h1><?= $user['role'] === 'Tenant' ? 'แจ้งซ่อมและติดตามงาน' : 'ศูนย์จัดการงานซ่อม' ?></h1><p class="muted"><?php if ($user['role'] === 'Staff'): ?>รับเรื่อง มอบหมายช่าง ตรวจราคา และส่งให้ Admin ยืนยันก่อนเริ่มงาน<?php elseif ($user['role'] === 'Admin'): ?>ตรวจสอบราคาและช่างผู้รับผิดชอบก่อนอนุมัติให้เริ่มงาน<?php elseif ($user['role'] === 'Technician'): ?>ประเมินราคาให้ Staff ตรวจสอบ และบันทึกผลหลังดำเนินการ<?php else: ?>แจ้งปัญหาที่พบและติดตามความคืบหน้าการซ่อมได้ที่นี่<?php endif; ?></p></div></section>
         <?php if ($user['role'] === 'Tenant'): ?><section class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">NEW REQUEST</p><h2>ส่งคำร้องแจ้งซ่อม</h2></div></div><?php if ($repairRooms): ?><form method="post" action="index.php" enctype="multipart/form-data" class="inline-form repair-form"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="create_repair"><input type="hidden" name="return_page" value="repairs"><input type="hidden" name="roomId" value="<?= e($repairRooms[0]['roomId']) ?>"><label>ห้องพัก<input value="<?= e($repairRooms[0]['roomNumber']) ?>" disabled></label><label class="wide">รายละเอียดปัญหา<textarea name="detail" maxlength="500" required placeholder="อธิบายปัญหาที่พบ"></textarea></label><label>แนบรูปภาพ<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label><button class="button primary" type="submit">ส่งคำร้อง</button></form><?php else: ?><div class="empty-state compact"><strong>ต้องมีสัญญาเช่าที่ใช้งานก่อนแจ้งซ่อม</strong></div><?php endif; ?></section><?php endif; ?>
@@ -1710,6 +1824,13 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
         </section>
         <section class="repair-grid <?= $user['role'] === 'Tenant' ? 'repair-grid-tenant' : 'repair-grid-workflow' ?>">
           <?php foreach ($activeRepairs as $repair):
+=======
+        <?php if ($user['role'] === 'Tenant'): $statement = db()->prepare('SELECT rp.*, r.roomNumber FROM Repair rp JOIN Room r ON r.roomId = rp.roomId WHERE rp.userId = ? ORDER BY rp.repairDate DESC'); $statement->execute([$user['userId']]); $repairs = $statement->fetchAll(); $repairRooms = $tenantContract ? [['roomId' => $tenantContract['roomId'], 'roomNumber' => $tenantContract['roomNumber']]] : []; else: $query = "SELECT rp.*, u.name, r.roomNumber, tech.name AS technicianName FROM Repair rp JOIN `User` u ON u.userId = rp.userId JOIN Room r ON r.roomId = rp.roomId LEFT JOIN `User` tech ON tech.userId = rp.maintenanceUserId"; if ($user['role'] === 'Technician') { $statement = db()->prepare($query . ' WHERE rp.maintenanceUserId = ? ORDER BY rp.repairDate DESC'); $statement->execute([$user['userId']]); $repairs = $statement->fetchAll(); } else { $repairs = db()->query($query . ' ORDER BY rp.repairDate DESC')->fetchAll(); } $repairRooms = []; endif; $technicians = $user['role'] === 'Staff' ? db()->query("SELECT userId, name FROM `User` WHERE role = 'Technician' ORDER BY name")->fetchAll() : []; $repairCostTypes = $user['role'] === 'Technician' ? db()->query('SELECT costTypeId, costTypeName FROM CostType ORDER BY costTypeId')->fetchAll() : []; ?>
+        <section class="page-heading"><div><p class="eyebrow">MAINTENANCE DESK</p><h1>งานซ่อม</h1><p class="muted">Staff มอบหมายช่างและส่งราคาที่ช่างประเมินให้ Admin อนุมัติก่อนเริ่มงาน</p></div></section>
+        <?php if ($user['role'] === 'Tenant'): ?><section class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">NEW REQUEST</p><h2>ส่งคำร้องแจ้งซ่อม</h2></div></div><?php if ($repairRooms): ?><form method="post" action="index.php" enctype="multipart/form-data" class="inline-form repair-form"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="create_repair"><input type="hidden" name="return_page" value="repairs"><input type="hidden" name="roomId" value="<?= e($repairRooms[0]['roomId']) ?>"><label>ห้องพัก<input value="<?= e($repairRooms[0]['roomNumber']) ?>" disabled></label><label class="wide">รายละเอียดปัญหา<textarea name="detail" maxlength="500" required placeholder="อธิบายปัญหาที่พบ"></textarea></label><label>แนบรูปภาพ<input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label><button class="button primary" type="submit">ส่งคำร้อง</button></form><?php else: ?><div class="empty-state compact"><strong>ต้องมีสัญญาเช่าที่ใช้งานก่อนแจ้งซ่อม</strong></div><?php endif; ?></section><?php endif; ?>
+        <section class="repair-grid">
+          <?php foreach ($repairs as $repair):
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
             $costQuery = db()->prepare('SELECT SUM(amount) FROM RepairDetail WHERE repairId = ?');
             $costQuery->execute([$repair['repairId']]);
             $costTotal = (float) $costQuery->fetchColumn();
@@ -1723,6 +1844,7 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
             }
 
             $isApprovedToWork = in_array($repair['repairStatus'], ['อนุมัติค่าใช้จ่ายแล้ว', 'กำลังซ่อม'], true);
+<<<<<<< HEAD
             $canAssignRepair = $user['role'] === 'Staff'
               && empty($repair['maintenanceUserId'])
               && in_array($repair['repairStatus'], ['รอรับเรื่อง', 'รอตรวจสอบ', 'รอผู้ดูแลมอบหมาย'], true);
@@ -1735,6 +1857,11 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
               || ($user['role'] === 'Admin' && $repair['repairStatus'] === 'รออนุมัติค่าใช้จ่าย')
               || ($user['role'] === 'Staff' && in_array($repair['repairStatus'], ['รออนุมัติค่าใช้จ่าย', 'รอแก้ไขค่าใช้จ่าย'], true))
               || ($user['role'] === 'Technician' && ($canQuote || in_array($repair['repairStatus'], ['รอ Staff ตรวจสอบราคา', 'รออนุมัติค่าใช้จ่าย'], true) || $isApprovedToWork));
+=======
+            $canQuote = $user['role'] === 'Technician'
+              && $repair['maintenanceUserId'] === $user['userId']
+              && in_array($repair['repairStatus'], ['มอบหมายช่างแล้ว', 'รอแก้ไขค่าใช้จ่าย'], true);
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
           ?>
             <article class="panel repair-card">
               <div class="repair-card-main">
@@ -1756,6 +1883,7 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
                   <?php endif; ?>
                 </div>
               </div>
+<<<<<<< HEAD
               <?php if ($user['role'] === 'Tenant'):
                 $progressStep = match ($repair['repairStatus']) {
                   'มอบหมายช่างแล้ว' => 2,
@@ -1770,10 +1898,30 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
                 <div class="repair-progress" aria-label="ความคืบหน้าการซ่อม">
                   <?php foreach (['รับเรื่อง', 'มอบหมายช่าง', 'ช่างประเมิน', 'Staff ตรวจ', 'Admin อนุมัติ', 'ดำเนินงาน'] as $stepIndex => $stepLabel): ?>
                     <span class="<?= $progressStep > $stepIndex ? 'is-complete' : ($progressStep === $stepIndex + 1 ? 'is-current' : '') ?>"><?= e($stepLabel) ?></span>
+=======
+
+              <h2><?= e(mb_strimwidth($repair['detail'], 0, 90, '...', 'UTF-8')) ?></h2>
+              <p class="muted"><?= e($repair['name'] ?? $user['name']) ?> · ห้อง <?= e($repair['roomNumber'] ?? '') ?> · <?= e(thai_date($repair['repairDate'])) ?></p>
+
+              <?php if (!empty($repair['image'])): ?>
+                <a class="text-link" href="file.php?repair=<?= e($repair['repairId']) ?>" target="_blank" rel="noopener">ดูรูปประกอบ ↗</a>
+              <?php endif; ?>
+
+              <?php if (!empty($repair['technicianName'])): ?>
+                <p class="repair-assignee">ช่างผู้รับผิดชอบ <strong><?= e($repair['technicianName']) ?></strong></p>
+              <?php endif; ?>
+
+              <?php if ($costItems): ?>
+                <div class="repair-assignee" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+                  <div>ราคาประเมินรวม: <strong><?= money($costTotal) ?> ฿</strong></div>
+                  <?php foreach ($costItems as $ci): ?>
+                    <small class="muted">• <?= e($ci['costTypeName']) ?><?= trim((string) $ci['equipment']) !== (string) $ci['costTypeName'] && trim((string) $ci['equipment']) !== '' ? ' · ' . e($ci['equipment']) : '' ?> — <?= money($ci['amount']) ?> ฿</small>
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                   <?php endforeach; ?>
                 </div>
               <?php endif; ?>
 
+<<<<<<< HEAD
               <?php if ($user['role'] === 'Technician' && !empty($repair['image'])): ?>
                 <a class="repair-request-photo" href="file.php?repair=<?= e($repair['repairId']) ?>" target="_blank" rel="noopener">
                   <img src="file.php?repair=<?= e($repair['repairId']) ?>&amp;raw=1" alt="รูปที่ผู้เช่าแนบประกอบคำร้อง" loading="lazy" decoding="async">
@@ -1811,6 +1959,10 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
               <div class="repair-card-actions">
               <?php if ($canAssignRepair): ?>
                 <form method="post" action="index.php" class="repair-controls repair-assignment-form">
+=======
+              <?php if ($user['role'] === 'Staff' && empty($repair['maintenanceUserId']) && in_array($repair['repairStatus'], ['รอรับเรื่อง', 'รอตรวจสอบ', 'รอผู้ดูแลมอบหมาย'], true)): ?>
+                <form method="post" action="index.php" class="repair-controls">
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                   <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
                   <input type="hidden" name="action" value="assign_repair">
                   <input type="hidden" name="repairId" value="<?= e($repair['repairId']) ?>">
@@ -1832,6 +1984,7 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
                   <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
                   <input type="hidden" name="repairId" value="<?= e($repair['repairId']) ?>">
                   <input type="hidden" name="return_page" value="repairs">
+<<<<<<< HEAD
                   <button class="button tiny success" name="action" value="approve_repair_cost" type="submit" data-confirm="ยืนยันราคา <?= money($costTotal) ?> ฿ และอนุมัติให้เริ่มงานหรือไม่?">ยืนยันและอนุมัติ</button>
                   <button class="button tiny danger" name="action" value="reject_repair_cost" type="submit" data-confirm="ส่งรายการนี้กลับให้ช่างปรับราคา ผ่าน Staff หรือไม่?">ส่งกลับให้ช่างปรับราคา</button>
                 </form>
@@ -1850,6 +2003,27 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
               <?php endif; ?>
               <?php if ($user['role'] === 'Staff' && $repair['repairStatus'] === 'รอแก้ไขค่าใช้จ่าย'): ?>
                 <p class="repair-flow-note repair-flow-note-warning">รายการถูกส่งกลับให้ช่างแก้ไขราคา · รอช่างส่งให้ตรวจอีกครั้ง</p>
+=======
+                  <button class="button tiny success" name="action" value="approve_repair_cost" type="submit" data-confirm="ยืนยันอนุมัติราคาประเมิน <?= money($costTotal) ?> ฿ เพื่อให้ช่างเริ่มทำงานหรือไม่?">อนุมัติราคา</button>
+                  <button class="button tiny danger" name="action" value="reject_repair_cost" type="submit" data-confirm="ส่งราคาประเมินกลับให้ช่างแก้ไขหรือไม่?">ส่งกลับแก้ไข</button>
+                </form>
+              <?php endif; ?>
+
+              <?php if ($user['role'] === 'Staff' && $repair['repairStatus'] === 'รอ Staff ตรวจสอบราคา'): ?>
+                <form method="post" action="index.php" class="repair-controls">
+                  <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                  <input type="hidden" name="repairId" value="<?= e($repair['repairId']) ?>">
+                  <input type="hidden" name="return_page" value="repairs">
+                  <button class="button tiny success" name="action" value="submit_repair_quote" type="submit" data-confirm="ยืนยันส่งราคาที่ช่างเสนอให้ Admin อนุมัติหรือไม่?">ส่งให้ Admin อนุมัติ</button>
+                  <button class="button tiny danger" name="action" value="return_repair_quote" type="submit" data-confirm="ส่งราคากลับให้ช่างแก้ไขหรือไม่?">ส่งกลับให้ช่างแก้ไข</button>
+                </form>
+              <?php elseif ($user['role'] === 'Staff' && $repair['repairStatus'] === 'รออนุมัติค่าใช้จ่าย'): ?>
+                <p class="repair-flow-note">ส่งราคาที่ช่างเสนอให้ Admin แล้ว · รออนุมัติ</p>
+              <?php endif; ?>
+
+              <?php if ($user['role'] === 'Staff' && $repair['repairStatus'] === 'รอแก้ไขค่าใช้จ่าย'): ?>
+                <p class="repair-flow-note">ส่งราคากลับให้ช่างแก้ไขแล้ว · รอช่างส่งให้ Staff ตรวจอีกครั้ง</p>
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
               <?php endif; ?>
 
               <?php if ($canQuote): ?>
@@ -1878,13 +2052,46 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
                 </form>
               <?php endif; ?>
 
+              <?php if ($canQuote): ?>
+                <form method="post" action="index.php" class="repair-quote-form" data-repair-cost-form>
+                  <strong>เสนอราคาค่าซ่อมให้ Staff</strong>
+                  <p class="form-hint">กรอกจำนวนเงินในประเภทค่าใช้จ่ายที่เกี่ยวข้อง เช่น ค่าแรง 200 และค่าอุปกรณ์ 70 ระบบจะรวมยอดให้อัตโนมัติ เว้นประเภทที่ไม่มีค่าใช้จ่ายได้</p>
+                  <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                  <input type="hidden" name="action" value="save_repair_cost">
+                  <input type="hidden" name="repairId" value="<?= e($repair['repairId']) ?>">
+                  <input type="hidden" name="return_page" value="repairs">
+                  <div class="repair-cost-list">
+                    <?php foreach ($repairCostTypes as $costType):
+                      $existingCost = $costItemsByType[$costType['costTypeId']] ?? null;
+                    ?>
+                      <div class="repair-cost-line">
+                        <label><?= e($costType['costTypeName']) ?> (บาท)
+                          <input type="number" name="costs[<?= e($costType['costTypeId']) ?>][amount]" min="0" max="99999999.99" step="0.01" value="<?= e((string) ($existingCost['amount'] ?? '')) ?>" placeholder="0.00" data-repair-cost-amount>
+                        </label>
+                      </div>
+                    <?php endforeach; ?>
+                  </div>
+                  <div class="repair-quote-summary" aria-live="polite"><span>รวมค่าใช้จ่ายทั้งหมด</span><strong><span data-repair-cost-total>0.00</span> ฿</strong></div>
+                  <button class="button tiny primary" type="submit" data-confirm="ยืนยันส่งราคาประเมินทุกรายการให้ Staff ตรวจสอบหรือไม่?">ส่งให้ Staff ตรวจสอบ</button>
+                </form>
+              <?php elseif ($user['role'] === 'Technician' && $repair['repairStatus'] === 'รอ Staff ตรวจสอบราคา'): ?>
+                <p class="repair-flow-note">ส่งราคาประเมินให้ Staff แล้ว · รอ Staff ตรวจสอบและส่ง Admin อนุมัติ</p>
+              <?php endif; ?>
+
               <?php if ($user['role'] === 'Technician' && $repair['repairStatus'] !== 'ซ่อมเสร็จแล้ว'): ?>
+<<<<<<< HEAD
                 <?php if ($repair['repairStatus'] === 'รอ Staff ตรวจสอบราคา'): ?>
                   <p class="repair-flow-note">ส่งราคาประเมินให้ Staff แล้ว · รอ Staff ตรวจสอบ</p>
                 <?php elseif ($repair['repairStatus'] === 'รออนุมัติค่าใช้จ่าย'): ?>
                   <p class="repair-flow-note">Staff ตรวจราคาแล้ว · รอ Admin อนุมัติก่อนเริ่มซ่อม</p>
                 <?php elseif ($repair['repairStatus'] === 'รอแก้ไขค่าใช้จ่าย'): ?>
                   <p class="repair-flow-note repair-flow-note-warning">รายการถูกส่งกลับให้ช่างปรับราคา แล้วส่งให้ Staff ตรวจอีกครั้ง</p>
+=======
+                <?php if ($repair['repairStatus'] === 'รออนุมัติค่าใช้จ่าย'): ?>
+                  <p class="repair-flow-note">Staff ส่งราคาประเมินแล้ว · รอ Admin อนุมัติก่อนเริ่มซ่อม</p>
+                <?php elseif ($repair['repairStatus'] === 'รอแก้ไขค่าใช้จ่าย'): ?>
+                  <p class="repair-flow-note">ราคาถูกส่งกลับให้แก้ไขแล้ว · โปรดส่งให้ Staff ตรวจสอบอีกครั้ง</p>
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                 <?php elseif ($isApprovedToWork): ?>
                   <form method="post" action="index.php" enctype="multipart/form-data" class="repair-result-form" data-repair-result-form data-has-completion-image="<?= !empty($repair['completionImage']) ? '1' : '0' ?>" style="border-top: 1px solid var(--border); padding-top: 12px;">
                     <strong style="font-size: 0.9rem; color: #059669;">✓ อนุมัติราคาแล้ว — บันทึกการทำงานพร้อมแนบรูป</strong>
@@ -1901,8 +2108,13 @@ $title = ($page === 'payments') ? 'ใบแจ้งหนี้' : page_title(
                     <label>รายละเอียดผลการซ่อม
                       <textarea name="repairResult" maxlength="2000" rows="2" required placeholder="บันทึกสิ่งที่ดำเนินการซ่อม"><?= e($repair['repairResult'] ?? '') ?></textarea>
                     </label>
+<<<<<<< HEAD
                     <label>แนบรูปหลังซ่อม <small>(บังคับเมื่อปิดงาน)</small>
                       <input type="file" name="completionImage" accept="image/jpeg,image/png,image/webp" data-repair-completion-image>
+=======
+                    <label>แนบรูปหลังซ่อม <small>(ไม่บังคับ)</small>
+                      <input type="file" name="completionImage" accept="image/jpeg,image/png,image/webp">
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
                     </label>
                     <button class="button tiny success" type="submit" data-confirm="ยืนยันบันทึกผลการซ่อมนี้หรือไม่?">บันทึกการทำงาน</button>
                   </form>

@@ -105,6 +105,7 @@ function billing_month_variants(string $month): array
     ];
 }
 
+<<<<<<< HEAD
 function billing_due_date(string $month): string
 {
     $normalized = normalize_billing_month($month);
@@ -139,6 +140,8 @@ function late_fee_dates(string $dueDate, string $throughDate): array
     return $dates;
 }
 
+=======
+>>>>>>> 337983a80f683fe30726dc14e4d5cb7a0759567c
 function latest_meter_readings_before(string $month, array $roomIds = [], string $excludeMeterId = ''): array
 {
     $targetIndex = billing_month_index($month);
