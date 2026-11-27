@@ -16,6 +16,8 @@ date_default_timezone_set('Asia/Bangkok');
 const APP_NAME = 'ฟ้าใสเพลส';
 const WATER_RATE = 18.00;
 const ELECTRIC_RATE = 8.00;
+const LATE_FEE_GRACE_DAYS = 7;
+const LATE_FEE_PER_DAY = 50.00;
 
 function database_config(): array
 {

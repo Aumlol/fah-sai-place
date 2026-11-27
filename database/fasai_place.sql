@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS Contract (
   endDate DATE DEFAULT NULL,
   deposit DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   status VARCHAR(50) NOT NULL DEFAULT 'ใช้งานอยู่',
+  lateFeeClauseAccepted TINYINT(1) NOT NULL DEFAULT 0,
   tenantSignature LONGTEXT DEFAULT NULL,
   coTenantSignature LONGTEXT DEFAULT NULL,
   landlordSignature LONGTEXT DEFAULT NULL,
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS Contract (
   CONSTRAINT fk_contract_cotenant FOREIGN KEY (coTenantUserId) REFERENCES `User` (userId),
   CONSTRAINT fk_contract_room FOREIGN KEY (roomId) REFERENCES Room (roomId),
   CONSTRAINT chk_contract_deposit CHECK (deposit >= 0),
+  CONSTRAINT chk_contract_late_fee_clause CHECK (lateFeeClauseAccepted IN (0, 1)),
   CONSTRAINT chk_contract_dates CHECK (endDate IS NULL OR endDate >= startDate)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -89,13 +91,16 @@ CREATE TABLE IF NOT EXISTS Invoice (
 CREATE TABLE IF NOT EXISTS Fine (
   fineId VARCHAR(16) NOT NULL,
   contractId VARCHAR(12) NOT NULL,
+  invoiceId VARCHAR(16) DEFAULT NULL,
   fineDate DATE NOT NULL,
   description VARCHAR(500) NOT NULL,
   amount DECIMAL(10,2) NOT NULL,
   status VARCHAR(30) NOT NULL DEFAULT 'รอชำระ',
   PRIMARY KEY (fineId),
+  UNIQUE KEY uq_fine_invoice_day (invoiceId, fineDate),
   KEY idx_fine_contract_status (contractId, status),
   CONSTRAINT fk_fine_contract FOREIGN KEY (contractId) REFERENCES Contract (contractId),
+  CONSTRAINT fk_fine_invoice FOREIGN KEY (invoiceId) REFERENCES Invoice (invoiceId),
   CONSTRAINT chk_fine_amount CHECK (amount > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -105,6 +110,7 @@ CREATE TABLE IF NOT EXISTS Payment (
   invoiceId VARCHAR(16) DEFAULT NULL,
   fineId VARCHAR(16) DEFAULT NULL,
   paymentDate DATE NOT NULL,
+  submittedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   amount DECIMAL(10,2) NOT NULL,
   evidence VARCHAR(255) DEFAULT NULL,
   status VARCHAR(30) NOT NULL DEFAULT 'รอตรวจสอบ',
@@ -114,6 +120,7 @@ CREATE TABLE IF NOT EXISTS Payment (
   KEY idx_payment_fine (fineId),
   KEY idx_payment_status (status),
   KEY idx_payment_date (paymentDate),
+  KEY idx_payment_invoice_status_submitted (invoiceId, status, submittedAt),
   CONSTRAINT fk_payment_contract FOREIGN KEY (contractId) REFERENCES Contract (contractId),
   CONSTRAINT fk_payment_invoice FOREIGN KEY (invoiceId) REFERENCES Invoice (invoiceId),
   CONSTRAINT fk_payment_fine FOREIGN KEY (fineId) REFERENCES Fine (fineId),
@@ -126,6 +133,11 @@ CREATE TABLE IF NOT EXISTS MeterRecord (
   roomId VARCHAR(9) NOT NULL,
   waterUnit DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   electricUnit DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  waterReading DECIMAL(10,2) DEFAULT NULL,
+  electricReading DECIMAL(10,2) DEFAULT NULL,
+  usageCalculated TINYINT(1) NOT NULL DEFAULT 0,
+  waterReset TINYINT(1) NOT NULL DEFAULT 0,
+  electricReset TINYINT(1) NOT NULL DEFAULT 0,
   recordDate DATE NOT NULL,
   month VARCHAR(20) NOT NULL,
   PRIMARY KEY (meterId),
@@ -133,7 +145,11 @@ CREATE TABLE IF NOT EXISTS MeterRecord (
   KEY idx_meter_month (month),
   CONSTRAINT fk_meter_room FOREIGN KEY (roomId) REFERENCES Room (roomId),
   CONSTRAINT chk_meter_water CHECK (waterUnit >= 0),
-  CONSTRAINT chk_meter_electric CHECK (electricUnit >= 0)
+  CONSTRAINT chk_meter_electric CHECK (electricUnit >= 0),
+  CONSTRAINT chk_meter_water_reading CHECK (waterReading IS NULL OR waterReading >= 0),
+  CONSTRAINT chk_meter_electric_reading CHECK (electricReading IS NULL OR electricReading >= 0),
+  CONSTRAINT chk_meter_water_reset CHECK (waterReset IN (0, 1)),
+  CONSTRAINT chk_meter_electric_reset CHECK (electricReset IN (0, 1))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS Repair (

@@ -13,7 +13,15 @@ function money(float|int|string $amount): string
     return number_format((float) $amount, 2);
 }
 
-<<<<<<< HEAD
+function meter_reading_display(float|int|string $reading): string
+{
+    $value = rtrim(rtrim(number_format((float) $reading, 2, '.', ''), '0'), '.');
+    [$whole, $fraction] = array_pad(explode('.', $value, 2), 2, '');
+    $whole = str_pad($whole, 4, '0', STR_PAD_LEFT);
+
+    return $fraction === '' ? $whole : $whole . '.' . $fraction;
+}
+
 function thai_date(?string $dateString): string
 {
     if ($dateString === null || trim($dateString) === '') {
@@ -48,8 +56,6 @@ function thai_month_year(?string $dateString): string
     return ($thaiMonths[$m] ?? date('M', $timestamp)) . ' ' . $y;
 }
 
-=======
->>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
 function normalize_billing_month(string $month): ?string
 {
     if (!preg_match('/^(\d{1,2})\/(\d{4})$/D', trim($month), $matches)) {
@@ -97,6 +103,92 @@ function billing_month_variants(string $month): array
         $normalized,
         sprintf('%02d/%04d', $monthNumber, $year - 543),
     ];
+}
+
+function billing_due_date(string $month): string
+{
+    $normalized = normalize_billing_month($month);
+    if ($normalized === null) {
+        throw new InvalidArgumentException('Invalid billing month');
+    }
+
+    [$monthNumber, $buddhistYear] = array_map('intval', explode('/', $normalized));
+    $firstDay = DateTimeImmutable::createFromFormat(
+        '!Y-m-d',
+        sprintf('%04d-%02d-01', $buddhistYear - 543, $monthNumber)
+    );
+    if ($firstDay === false) {
+        throw new InvalidArgumentException('Invalid billing month');
+    }
+
+    return $firstDay->modify('first day of next month')->format('Y-m-d');
+}
+
+function late_fee_dates(string $dueDate, string $throughDate): array
+{
+    $firstFeeDate = (new DateTimeImmutable($dueDate))
+        ->modify('+' . (LATE_FEE_GRACE_DAYS + 1) . ' days');
+    $lastFeeDate = new DateTimeImmutable($throughDate);
+    $dates = [];
+
+    while ($firstFeeDate <= $lastFeeDate) {
+        $dates[] = $firstFeeDate->format('Y-m-d');
+        $firstFeeDate = $firstFeeDate->modify('+1 day');
+    }
+
+    return $dates;
+}
+
+function latest_meter_readings_before(string $month, array $roomIds = [], string $excludeMeterId = ''): array
+{
+    $targetIndex = billing_month_index($month);
+    if ($targetIndex === null) {
+        throw new InvalidArgumentException('Invalid meter billing month');
+    }
+
+    $sql = 'SELECT meterId, roomId, month, waterUnit, electricUnit, waterReading, electricReading, recordDate FROM MeterRecord';
+    $conditions = [];
+    $parameters = [];
+    if ($roomIds !== []) {
+        $conditions[] = 'roomId IN (' . implode(', ', array_fill(0, count($roomIds), '?')) . ')';
+        array_push($parameters, ...$roomIds);
+    }
+    if ($excludeMeterId !== '') {
+        $conditions[] = 'meterId != ?';
+        $parameters[] = $excludeMeterId;
+    }
+    if ($conditions !== []) {
+        $sql .= ' WHERE ' . implode(' AND ', $conditions);
+    }
+
+    $statement = db()->prepare($sql);
+    $statement->execute($parameters);
+
+    $latestByRoom = [];
+    foreach ($statement->fetchAll() as $record) {
+        $recordMonth = billing_month_index((string) $record['month']);
+        if ($recordMonth === null || $recordMonth >= $targetIndex) {
+            continue;
+        }
+
+        $roomId = (string) $record['roomId'];
+        $lastMonth = isset($latestByRoom[$roomId])
+            ? billing_month_index((string) $latestByRoom[$roomId]['month'])
+            : null;
+        if ($lastMonth !== null && $lastMonth >= $recordMonth) {
+            continue;
+        }
+
+        $record['waterReading'] = $record['waterReading'] !== null
+            ? (float) $record['waterReading']
+            : (float) $record['waterUnit'];
+        $record['electricReading'] = $record['electricReading'] !== null
+            ? (float) $record['electricReading']
+            : (float) $record['electricUnit'];
+        $latestByRoom[$roomId] = $record;
+    }
+
+    return $latestByRoom;
 }
 
 function generate_id(string $prefix, int $length = 4): string

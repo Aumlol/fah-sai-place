@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.querySelector('#sidebar');
   const backdrop = document.querySelector('[data-sidebar-backdrop]');
@@ -12,22 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeMobileSidebar = () => {
     sidebar?.classList.remove('open');
     backdrop?.classList.remove('open');
-=======
-function updateAccountPassword(modal) {
-  const form = modal.querySelector('form');
-  const password = form.querySelector('[data-password]');
-  const confirmation = form.querySelector('[data-password-confirm]');
-  const strength = modal.querySelector('[data-password-strength]');
-  const strengthLabel = modal.querySelector('[data-password-strength-label]');
-  const matchLabel = modal.querySelector('[data-password-match]');
-  const criteria = {
-    length: password.value.length >= 12,
-    lowercase: /[a-z]/.test(password.value),
-    uppercase: /[A-Z]/.test(password.value),
-    number: /[0-9]/.test(password.value),
-    symbol: /[^a-zA-Z0-9]/.test(password.value),
->>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
   };
+
+  document.querySelectorAll('[data-repair-result-form]').forEach((form) => {
+    const status = form.querySelector('[data-repair-status]');
+    const image = form.querySelector('[data-repair-completion-image]');
+    if (!status || !image) return;
+
+    const syncCompletionImageRequirement = () => {
+      image.required = status.value === 'ซ่อมเสร็จแล้ว' && form.dataset.hasCompletionImage !== '1';
+    };
+
+    status.addEventListener('change', syncCompletionImageRequirement);
+    syncCompletionImageRequirement();
+  });
 
   const toggleSidebar = () => {
     if (!sidebar) return;
@@ -47,37 +44,10 @@ function updateAccountPassword(modal) {
 
   backdrop?.addEventListener('click', closeMobileSidebar);
 
-<<<<<<< HEAD
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeMobileSidebar();
-=======
-function addMobileTableLabels() {
-  document.querySelectorAll('.table-scroll table').forEach(table => {
-    const labels = Array.from(table.querySelectorAll('thead th'), th => th.textContent.trim());
-    table.querySelectorAll('tbody tr').forEach(row => {
-      Array.from(row.children).forEach((cell, index) => {
-        if (!cell.dataset.label) {
-          cell.dataset.label = labels[index] || '';
-        }
-      });
-    });
-  });
-}
-
-addMobileTableLabels();
-
-function resetPasswordVisibility(form) {
-  form.querySelectorAll('.password-control').forEach(control => {
-    control.querySelector('input').type = 'password';
-    const toggle = control.querySelector('[data-toggle-password]');
-    toggle.textContent = 'แสดง';
-    toggle.setAttribute('aria-label', toggle.dataset.togglePassword === 'password'
-      ? 'แสดงรหัสผ่าน'
-      : 'แสดงรหัสผ่านที่ยืนยัน');
->>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
   });
 
-<<<<<<< HEAD
   mobileMedia.addEventListener('change', (event) => {
     if (event.matches) {
       document.body.classList.remove('sidebar-collapsed');
@@ -86,68 +56,6 @@ function resetPasswordVisibility(form) {
       document.body.classList.add('sidebar-collapsed');
     }
   });
-=======
-function updateRoomAssignmentForm(modal) {
-  const form = modal.querySelector('form');
-  const status = form.querySelector('[data-room-status]');
-  const assignmentFields = form.querySelector('[data-room-assignment-fields]');
-  const tenant = form.querySelector('[data-room-tenant]');
-  const startDate = form.querySelector('[data-room-start]');
-  const deposit = form.querySelector('[data-room-deposit]');
-  const note = form.querySelector('[data-room-assignment-note]');
-  const roomId = form.querySelector('[name="roomId"]').value;
-  const currentTenantId = form.dataset.currentTenant || '';
-  const isOccupied = status.value === 'มีผู้เช่า';
-  const hasCurrentLease = currentTenantId !== '' && tenant.value === currentTenantId;
-  const needsNewLease = isOccupied && !hasCurrentLease;
-
-  assignmentFields.hidden = !isOccupied;
-  tenant.required = isOccupied;
-  startDate.required = needsNewLease;
-  deposit.required = needsNewLease;
-  note.textContent = hasCurrentLease
-    ? 'ห้องนี้เชื่อมกับผู้เช่าปัจจุบันแล้ว หากต้องการเปลี่ยนผู้เช่าให้สิ้นสุดสัญญาเดิมก่อน'
-    : 'เลือกผู้เช่าที่ยังไม่มีสัญญาใช้งานอยู่ และระบุวันที่เริ่มสัญญา';
-
-  Array.from(tenant.options).forEach(option => {
-    const activeRoomId = option.dataset.activeRoom || '';
-    option.disabled = activeRoomId !== '' && activeRoomId !== roomId;
-  });
-}
-
-document.addEventListener('click', event => {
-  const openButton = event.target.closest('[data-modal-open]');
-  if (openButton) {
-    const modal = document.getElementById(openButton.dataset.modalOpen);
-    if (modal && openButton.dataset.modalOpen === 'room-modal') {
-      const form = modal.querySelector('form');
-      form.reset();
-      form.querySelector('[name="roomId"]').value = '';
-      form.dataset.currentTenant = '';
-      updateRoomAssignmentForm(modal);
-    }
-    if (modal && openButton.dataset.modalOpen === 'user-modal' && !openButton.dataset.editAccount) {
-      const form = modal.querySelector('form');
-      form.reset();
-      resetPasswordVisibility(form);
-      form.querySelector('[name="userId"]').value = '';
-      modal.querySelector('h2').textContent = 'เพิ่มบัญชีผู้ใช้งาน';
-      modal.querySelector('[type="submit"]').textContent = 'สร้างบัญชี';
-      form.querySelector('[name="password"]').required = true;
-      form.querySelector('[name="password_confirm"]').required = true;
-      modal.querySelector('[data-password-note]').textContent = 'รหัสผ่านใหม่ต้องผ่านเงื่อนไขครบทุกข้อ';
-      updateAccountPassword(modal);
-    }
-    if (modal && openButton.dataset.modalOpen === 'news-modal') {
-      const form = modal.querySelector('form');
-      form.reset();
-      form.querySelector('[name="newsId"]').value = '';
-      modal.querySelector('h2').textContent = 'เพิ่มประกาศ';
-      modal.querySelector('[type="submit"]').textContent = 'เผยแพร่';
-    }
-    if (modal) modal.showModal();
-  }
->>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
 
   document.querySelectorAll('.sidebar .nav-link, .sidebar .help-note').forEach((link) => {
     link.addEventListener('click', () => {
@@ -334,135 +242,7 @@ document.addEventListener('click', event => {
         image.removeAttribute('src');
         image.hidden = true;
       }
-<<<<<<< HEAD
       dialog.showModal();
-=======
-      modal.showModal();
-    }
-  }
-
-  const closeButton = event.target.closest('[data-modal-close]');
-  if (closeButton) closeButton.closest('dialog')?.close();
-
-  const passwordToggle = event.target.closest('[data-toggle-password]');
-  if (passwordToggle) {
-    const input = passwordToggle.closest('.password-control').querySelector('input');
-    const visible = input.type === 'password';
-    input.type = visible ? 'text' : 'password';
-    passwordToggle.textContent = visible ? 'ซ่อน' : 'แสดง';
-    passwordToggle.setAttribute('aria-label', visible ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน');
-  }
-
-  const dismissButton = event.target.closest('[data-dismiss]');
-  if (dismissButton) dismissButton.closest('.alert')?.remove();
-
-  const menuButton = event.target.closest('[data-menu-toggle]');
-  if (menuButton) document.getElementById('sidebar')?.classList.toggle('open');
-
-  const editButton = event.target.closest('[data-edit-room]');
-  if (editButton) {
-    const modal = document.getElementById('room-modal');
-    const room = JSON.parse(editButton.dataset.room);
-    const form = modal.querySelector('form');
-    form.querySelector('[name="roomId"]').value = room.roomId;
-    form.querySelector('[name="roomNumber"]').value = room.roomNumber;
-    form.querySelector('[name="roomStatus"]').value = room.roomStatus;
-    form.querySelector('[name="rentalPrice"]').value = room.rentalPrice;
-    form.dataset.currentTenant = room.activeTenantId || '';
-    form.querySelector('[name="tenantId"]').value = room.activeTenantId || '';
-    form.querySelector('[name="startDate"]').value = room.activeStartDate || '';
-    form.querySelector('[name="deposit"]').value = room.activeDeposit ?? '0';
-    updateRoomAssignmentForm(modal);
-    modal.showModal();
-  }
-
-  const editNewsButton = event.target.closest('[data-edit-news]');
-  if (editNewsButton) {
-    const modal = document.getElementById('news-modal');
-    const news = JSON.parse(editNewsButton.dataset.news);
-    const form = modal.querySelector('form');
-    form.querySelector('[name="newsId"]').value = news.newsId;
-    form.querySelector('[name="title"]').value = news.title;
-    form.querySelector('[name="detail"]').value = news.detail;
-    modal.querySelector('h2').textContent = 'แก้ไขประกาศ';
-    modal.querySelector('[type="submit"]').textContent = 'บันทึกการแก้ไข';
-    modal.showModal();
-  }
-
-  const editAccountButton = event.target.closest('[data-edit-account]');
-  if (editAccountButton) {
-    const modal = document.getElementById('user-modal');
-    const account = JSON.parse(editAccountButton.dataset.account);
-    const form = modal.querySelector('form');
-    form.reset();
-    resetPasswordVisibility(form);
-    for (const [field, value] of Object.entries(account)) {
-      const input = form.querySelector(`[name="${field}"]`);
-      if (input) input.value = value;
-    }
-    form.querySelector('[name="password"]').value = '';
-    form.querySelector('[name="password"]').required = false;
-    form.querySelector('[name="password_confirm"]').value = '';
-    form.querySelector('[name="password_confirm"]').required = false;
-    modal.querySelector('[data-password-note]').textContent = 'เว้นว่างทั้งสองช่องหากไม่ต้องการเปลี่ยนรหัสผ่าน';
-    updateAccountPassword(modal);
-    modal.querySelector('h2').textContent = 'แก้ไขบัญชีผู้ใช้งาน';
-    modal.querySelector('[type="submit"]').textContent = 'บันทึกการแก้ไข';
-    modal.showModal();
-  }
-
-  const confirmButton = event.target.closest('[data-confirm]');
-  if (confirmButton && !window.confirm(confirmButton.dataset.confirm)) event.preventDefault();
-});
-
-const accountForm = document.querySelector('#user-modal form');
-if (accountForm) {
-  const accountModal = document.getElementById('user-modal');
-  accountForm.addEventListener('input', event => {
-    if (event.target.matches('[data-password], [data-password-confirm]')) {
-      updateAccountPassword(accountModal);
-    }
-  });
-  accountForm.addEventListener('submit', () => updateAccountPassword(accountModal));
-}
-
-const roomModal = document.getElementById('room-modal');
-if (roomModal) {
-  roomModal.querySelector('[data-room-status]').addEventListener('change', () => {
-    updateRoomAssignmentForm(roomModal);
-  });
-  roomModal.querySelector('[data-room-tenant]').addEventListener('change', () => {
-    updateRoomAssignmentForm(roomModal);
-  });
-}
-
-document.querySelectorAll('dialog').forEach(modal => {
-  modal.addEventListener('click', event => {
-    if (event.target === modal) modal.close();
-  });
-});
-
-const clock = document.querySelector('[data-digital-clock]');
-if (clock) {
-  const updateClock = () => {
-    clock.textContent = new Intl.DateTimeFormat('th-TH', {
-      timeZone: 'Asia/Bangkok',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }).format(new Date());
-  };
-  updateClock();
-  window.setInterval(updateClock, 1000);
-}
-
-document.querySelectorAll('[data-table-search]').forEach(input => {
-  input.addEventListener('input', () => {
-    const query = input.value.trim().toLocaleLowerCase();
-    input.closest('.table-panel')?.querySelectorAll('[data-search-row]').forEach(row => {
-      row.hidden = !row.textContent.toLocaleLowerCase().includes(query);
->>>>>>> 449e13e86e3adc18aa01ae1b7b633c4fa3d8356a
     });
   });
 
@@ -595,118 +375,248 @@ document.querySelectorAll('[data-table-search]').forEach(input => {
     });
   });
 
-  const invoiceForm = document.querySelector('[data-invoice-form]');
-  if (invoiceForm) {
-    const contractSelect = invoiceForm.querySelector('[data-invoice-contract]');
-    const monthInput = invoiceForm.querySelector('[data-invoice-month]');
-    const rentInput = invoiceForm.querySelector('[data-invoice-rent]');
-    const waterInput = invoiceForm.querySelector('[data-invoice-water]');
-    const electricInput = invoiceForm.querySelector('[data-invoice-electric]');
-    const statusText = invoiceForm.querySelector('[data-meter-status]');
-    const waterText = invoiceForm.querySelector('[data-meter-water]');
-    const electricText = invoiceForm.querySelector('[data-meter-electric]');
-    const submitButton = invoiceForm.querySelector('button[type="submit"]');
-    let requestToken = 0;
-
-    const resetMeterPreview = (message) => {
-      if (statusText) statusText.textContent = message;
-      if (waterText) waterText.textContent = '—';
-      if (electricText) electricText.textContent = '—';
-      if (waterInput) waterInput.value = '';
-      if (electricInput) electricInput.value = '';
-    };
-
-    const syncSelectedRent = () => {
-      const option = contractSelect?.selectedOptions?.[0];
-      if (rentInput && option?.dataset.rent) {
-        rentInput.value = option.dataset.rent;
-      }
-    };
-
-    const lookupMeterReading = async () => {
-      const contractId = contractSelect?.value || '';
-      const month = monthInput?.value.trim() || '';
-      if (!contractId || !month) {
-        resetMeterPreview('เลือกผู้เช่าและระบุรอบเดือนเพื่อดึงข้อมูลมิเตอร์');
-        return;
-      }
-
-      const token = ++requestToken;
-      if (statusText) statusText.textContent = 'กำลังตรวจสอบบันทึกมิเตอร์...';
-      if (submitButton) submitButton.disabled = true;
-
-      try {
-        const query = new URLSearchParams({ action: 'meter_lookup', contractId, month });
-        const response = await fetch(`index.php?${query.toString()}`, {
-          headers: { Accept: 'application/json' },
-        });
-        const data = await response.json();
-        if (token !== requestToken) return;
-
-        if (response.ok && data.found) {
-          if (rentInput && data.rentalPrice !== undefined) rentInput.value = data.rentalPrice;
-          if (waterInput) waterInput.value = data.waterUnit;
-          if (electricInput) electricInput.value = data.electricUnit;
-          if (waterText) waterText.textContent = `${data.waterFormatted} หน่วย`;
-          if (electricText) electricText.textContent = `${data.electricFormatted} หน่วย`;
-          if (statusText) {
-            statusText.textContent = `พบข้อมูลมิเตอร์ห้อง ${data.roomNumber} รอบเดือน ${data.month} (บันทึกเมื่อ ${data.recordDate})`;
-          }
-        } else {
-          resetMeterPreview(data.message || 'ไม่พบข้อมูลมิเตอร์ของห้องและเดือนที่เลือก');
-        }
-      } catch (error) {
-        if (token === requestToken) {
-          resetMeterPreview('ไม่สามารถดึงข้อมูลมิเตอร์ได้ในขณะนี้');
-        }
-      } finally {
-        if (token === requestToken && submitButton) submitButton.disabled = false;
-      }
-    };
-
-    contractSelect?.addEventListener('change', () => {
-      syncSelectedRent();
-      lookupMeterReading();
+  const meterBatchForm = document.querySelector('[data-meter-batch-form]');
+  document.querySelectorAll('[data-repair-cost-form]').forEach((form) => {
+    const amounts = Array.from(form.querySelectorAll('[data-repair-cost-amount]'));
+    const total = form.querySelector('[data-repair-cost-total]');
+    const formatCurrency = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     });
-    monthInput?.addEventListener('input', lookupMeterReading);
-    monthInput?.addEventListener('change', lookupMeterReading);
-  }
 
-  const meterForm = document.querySelector('[data-meter-form]');
-  if (meterForm) {
-    const roomSelect = meterForm.querySelector('[data-meter-room]');
-    const waterInput = meterForm.querySelector('[name="waterUnit"]');
-    const electricInput = meterForm.querySelector('[name="electricUnit"]');
-    const previousMeter = meterForm.parentElement?.querySelector('[data-previous-meter]');
+    const updateTotal = () => {
+      const amountSum = amounts.reduce((sum, input) => {
+        const amount = Number(input.value);
+        return sum + (Number.isFinite(amount) && amount > 0 ? amount : 0);
+      }, 0);
+      total.textContent = formatCurrency.format(amountSum);
+    };
 
-    const updatePreviousMeter = () => {
-      const option = roomSelect?.selectedOptions?.[0];
-      if (!option || !option.value) {
-        if (previousMeter) previousMeter.textContent = 'เลือกห้องเพื่อดูบันทึกมิเตอร์ครั้งก่อน';
-        if (waterInput) waterInput.min = '0';
-        if (electricInput) electricInput.min = '0';
+    amounts.forEach((input) => {
+      input.addEventListener('input', updateTotal);
+      input.addEventListener('change', updateTotal);
+    });
+    updateTotal();
+  });
+
+  if (meterBatchForm) {
+    const meterRows = Array.from(meterBatchForm.querySelectorAll('[data-meter-row]'));
+    const meterFilter = meterBatchForm.querySelector('[data-meter-filter]');
+    const meterCount = meterBatchForm.querySelector('[data-meter-count]');
+    const meterMonthInput = meterBatchForm.querySelector('[data-meter-month]');
+    const meterMonthValue = meterBatchForm.querySelector('[data-meter-month-value]');
+    const meterSearchButton = meterBatchForm.querySelector('[data-meter-search]');
+    const meterReturnScroll = meterBatchForm.querySelector('[data-meter-return-scroll]');
+    const loadedMonth = meterMonthInput.value.trim();
+    let monthNavigationStarted = false;
+    const formatMeterUsage = value => new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+
+    const updateMeterUsage = (row) => {
+      const waterInput = row.querySelector('[name$="[waterReading]"]');
+      const electricInput = row.querySelector('[name$="[electricReading]"]');
+      const waterUsed = row.querySelector('[data-water-used]');
+      const electricUsed = row.querySelector('[data-electric-used]');
+      const status = row.querySelector('[data-meter-status]');
+
+      if (row.dataset.persisted === '1') {
+        const suffix = row.dataset.savedUsageCalculated === '1' ? '' : ' (ข้อมูลเดิม)';
+        waterUsed.textContent = `${formatMeterUsage(Number(row.dataset.savedWaterUsed))}${suffix}`;
+        electricUsed.textContent = `${formatMeterUsage(Number(row.dataset.savedElectricUsed))}${suffix}`;
+        status.textContent = 'บันทึกแล้ว · แก้ไขจากประวัติ';
+        row.dataset.entryState = 'complete';
+        row.classList.remove('meter-row-warning');
         return;
       }
-      const lastMonth = option.dataset.lastMonth || '';
-      const lastWater = option.dataset.lastWater || '';
-      const lastElectric = option.dataset.lastElectric || '';
-      const lastDate = option.dataset.lastDate || '';
-      if (!lastMonth) {
-        if (previousMeter) previousMeter.textContent = `ห้อง ${option.textContent.trim()} ยังไม่มีบันทึกมิเตอร์ก่อนหน้า`;
-        if (waterInput) waterInput.min = '0';
-        if (electricInput) electricInput.min = '0';
-        return;
-      }
-      if (waterInput) waterInput.min = lastWater || '0';
-      if (electricInput) electricInput.min = lastElectric || '0';
-      if (previousMeter) {
-        previousMeter.textContent = `มิเตอร์ล่าสุดห้อง ${option.textContent.trim()} (${lastMonth}, บันทึก ${lastDate}): น้ำ ${lastWater} หน่วย · ไฟ ${lastElectric} หน่วย`;
+
+      const updateReading = (input, output, previous) => {
+        input.setCustomValidity('');
+        if (input.value === '') {
+          output.textContent = '—';
+          return 'empty';
+        }
+        const current = Number(input.value);
+        if (!Number.isFinite(current) || current < previous) {
+          input.setCustomValidity('เลขมิเตอร์ต่ำกว่างวดก่อน กรุณาตรวจสอบอีกครั้ง');
+          output.textContent = 'ตรวจสอบเลข';
+          return 'invalid';
+        }
+        output.textContent = formatMeterUsage(current - previous);
+        return 'valid';
+      };
+
+      const waterState = updateReading(waterInput, waterUsed, Number(row.dataset.previousWater));
+      const electricState = updateReading(electricInput, electricUsed, Number(row.dataset.previousElectric));
+      const hasError = waterState === 'invalid' || electricState === 'invalid';
+      const isComplete = waterState === 'valid' && electricState === 'valid' && !hasError;
+
+      row.dataset.entryState = hasError ? 'invalid' : (isComplete ? 'complete' : 'pending');
+      row.classList.toggle('meter-row-warning', hasError);
+      status.textContent = hasError
+        ? 'ตรวจเลขมิเตอร์'
+        : (isComplete
+          ? (row.dataset.persisted === '1' ? 'แก้ไขแล้ว' : 'กรอกครบแล้ว')
+          : (waterState === 'empty' && electricState === 'empty' ? 'ยังไม่อ่าน' : 'กรอกไม่ครบ'));
+    };
+
+    const updateMeterList = () => {
+      meterRows.forEach(updateMeterUsage);
+      const completed = meterRows.filter(row => row.dataset.entryState === 'complete').length;
+      const pending = meterRows.length - completed;
+      meterCount.textContent = `กรอกครบ ${completed}/${meterRows.length} ห้อง · เหลือ ${pending} ห้อง`;
+
+      meterRows.forEach((row) => {
+        const filter = meterFilter.value;
+        const shouldHide = filter === 'complete'
+          ? row.dataset.entryState !== 'complete'
+          : (filter === 'pending' && row.dataset.entryState === 'complete');
+        row.hidden = shouldHide && row.dataset.entryState !== 'invalid';
+      });
+    };
+
+    const handleMeterInput = (row) => {
+      updateMeterList();
+      if (row.hidden) {
+        const nextRow = meterRows.find(candidate => !candidate.hidden && candidate.dataset.entryState !== 'complete');
+        const nextInput = nextRow?.querySelector('[name$="[waterReading]"]');
+        if (nextInput) nextInput.focus();
+        else meterBatchForm.querySelector('[type="submit"]')?.focus();
       }
     };
 
-    roomSelect?.addEventListener('change', updatePreviousMeter);
-    updatePreviousMeter();
+    meterRows.forEach((row) => {
+      row.querySelectorAll('.meter-reading-input').forEach((input) => {
+        input.addEventListener('input', () => handleMeterInput(row));
+        input.addEventListener('change', () => handleMeterInput(row));
+        input.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter') return;
+          event.preventDefault();
+          const inputs = meterRows
+            .filter(candidate => !candidate.hidden)
+            .flatMap(candidate => Array.from(candidate.querySelectorAll('.meter-reading-input')));
+          const nextInput = inputs[inputs.indexOf(input) + 1];
+          nextInput?.focus();
+        });
+      });
+    });
+
+    meterFilter.addEventListener('change', updateMeterList);
+    updateMeterList();
+
+    const switchMeterMonth = () => {
+      if (monthNavigationStarted) return true;
+      const month = meterMonthInput.value.trim();
+      meterMonthInput.setCustomValidity('');
+      if (month === loadedMonth) return false;
+      if (!/^(0?[1-9]|1[0-2])\/\d{4}$/.test(month)) {
+        meterMonthInput.setCustomValidity('กรุณาระบุรอบบิลรูปแบบ MM/YYYY');
+        meterMonthInput.reportValidity();
+        return true;
+      }
+      if (meterMonthValue) meterMonthValue.value = month;
+
+      const hasUnsavedReadings = meterRows.some((row) => (
+        row.dataset.persisted !== '1'
+        && Array.from(row.querySelectorAll('.meter-reading-input')).some(input => input.value.trim() !== '')
+      ));
+      if (hasUnsavedReadings && !window.confirm('เปลี่ยนรอบบิลแล้วข้อมูลที่กรอกแต่ยังไม่บันทึกจะหายไป ต้องการเปลี่ยนรอบหรือไม่?')) {
+        meterMonthInput.value = loadedMonth;
+        return true;
+      }
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', 'meters');
+      url.searchParams.set('month', month);
+      monthNavigationStarted = true;
+      window.location.assign(url.toString());
+      return true;
+    };
+
+    meterSearchButton?.addEventListener('click', switchMeterMonth);
+    meterMonthInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        switchMeterMonth();
+      }
+    });
+
+    meterBatchForm.addEventListener('submit', (event) => {
+      if (meterReturnScroll) meterReturnScroll.value = String(window.scrollY || window.pageYOffset || 0);
+      if (switchMeterMonth()) {
+        event.preventDefault();
+        return;
+      }
+      updateMeterList();
+      const hasNewReadings = meterRows.some((row) => (
+        row.dataset.persisted !== '1'
+        && Array.from(row.querySelectorAll('.meter-reading-input')).some(input => input.value.trim() !== '')
+      ));
+      if (!hasNewReadings) {
+        event.preventDefault();
+        meterCount.textContent = 'ไม่มีข้อมูลใหม่ให้บันทึก หากแก้ไขรายการเดิมให้ใช้ปุ่มแก้ไขด้านล่าง';
+        return;
+      }
+      const invalidInput = meterBatchForm.querySelector(':invalid');
+      if (invalidInput) {
+        event.preventDefault();
+        invalidInput.reportValidity();
+      }
+    });
   }
+
+  const meterHistoryForm = document.querySelector('[data-meter-history-form]');
+  if (meterHistoryForm) {
+    const meterHistoryTable = document.querySelector('[data-meter-history-table]');
+    const selectAll = meterHistoryTable?.querySelector('[data-meter-select-all]');
+    const selectAllCell = selectAll?.closest('th');
+    const selections = Array.from(meterHistoryTable?.querySelectorAll('[data-meter-select]') || []);
+    const deleteSelected = document.querySelector('[data-meter-delete-selected]');
+    const selectedCount = document.querySelector('[data-meter-selected-count]');
+
+    const updateSelection = () => {
+      const selected = selections.filter(input => input.checked);
+      selections.forEach(input => {
+        input.closest('tr')?.classList.toggle('is-selected', input.checked);
+      });
+      if (selectedCount) selectedCount.textContent = `เลือก ${selected.length} รายการ`;
+      if (deleteSelected) deleteSelected.disabled = selected.length === 0;
+      if (selectAll) selectAll.checked = selections.length > 0 && selected.length === selections.length;
+    };
+
+    selectAll?.addEventListener('change', () => {
+      selections.forEach(input => { input.checked = selectAll.checked; });
+      updateSelection();
+    });
+    selectAllCell?.addEventListener('click', event => {
+      if (event.target instanceof Element && event.target.closest('input')) return;
+      if (!selectAll) return;
+      selectAll.checked = !selectAll.checked;
+      selections.forEach(input => { input.checked = selectAll.checked; });
+      updateSelection();
+    });
+    selections.forEach(input => {
+      input.addEventListener('change', updateSelection);
+      const row = input.closest('tr');
+      if (!row) return;
+      row.classList.add('is-clickable');
+      row.addEventListener('click', event => {
+        if (!(event.target instanceof Element) || event.target.closest('button,a,input,select,textarea,label,form')) return;
+        input.checked = !input.checked;
+        updateSelection();
+      });
+    });
+    updateSelection();
+  }
+
+  document.querySelector('[data-meter-history-month]')?.addEventListener('change', (event) => {
+    const url = new URL(window.location.href);
+    if (event.target.value) url.searchParams.set('historyMonth', event.target.value);
+    else url.searchParams.delete('historyMonth');
+    url.searchParams.set('page', 'meters');
+    window.location.assign(url.toString());
+  });
 
   // แสดงวันที่ พ.ศ. (วว/ดด/พ.ศ.) ทับในช่อง input[type="date"] โดยตรง เพื่อไม่ให้เสีย Layout และไม่โชว์ ค.ศ.
   const formatThaiBE = (isoDate) => {
@@ -794,46 +704,44 @@ document.querySelectorAll('[data-table-search]').forEach(input => {
   });
 });
 
-const meterForm = document.querySelector('[data-meter-form]');
-if (meterForm) {
-  const roomSelect = meterForm.querySelector('[data-meter-room]');
-  const previousMeter = document.querySelector('[data-previous-meter]');
-  const updatePreviousMeter = () => {
-    const option = roomSelect.selectedOptions[0];
-    if (!roomSelect.value) {
-      previousMeter.textContent = 'เลือกห้องเพื่อดูบันทึกมิเตอร์ครั้งก่อน';
-    } else if (!option.dataset.lastMonth) {
-      previousMeter.textContent = 'ห้องนี้ยังไม่มีบันทึกมิเตอร์ก่อนหน้า';
-    } else {
-      previousMeter.textContent = `บันทึกครั้งก่อน เดือน ${option.dataset.lastMonth} (${option.dataset.lastDate}): น้ำ ${option.dataset.lastWater} หน่วย · ไฟฟ้า ${option.dataset.lastElectric} หน่วย`;
-    }
-  };
-  roomSelect.addEventListener('change', updatePreviousMeter);
-  updatePreviousMeter();
-}
-
 const invoiceForm = document.querySelector('[data-invoice-form]');
 if (invoiceForm) {
-  const contractInput = invoiceForm.querySelector('[data-invoice-contract]');
   const monthInput = invoiceForm.querySelector('[data-invoice-month]');
+  const monthValue = invoiceForm.querySelector('[data-invoice-month-value]');
+  const dueDateInput = invoiceForm.querySelector('[data-invoice-due-date]');
+  const monthSearch = invoiceForm.querySelector('[data-invoice-search]');
   const preview = invoiceForm.querySelector('[data-invoice-preview]');
-  const submitButton = invoiceForm.querySelector('[type="submit"]');
+  const submitButton = invoiceForm.querySelector('[data-invoice-submit]');
+  const meterTable = invoiceForm.querySelector('[data-invoice-meter-table]');
   let lookupController;
 
   const resetPreview = message => {
     preview.dataset.state = 'idle';
     preview.querySelector('[data-invoice-status]').textContent = message;
-    preview.querySelector('[data-invoice-rent]').textContent = '—';
-    preview.querySelector('[data-invoice-water]').textContent = '—';
-    preview.querySelector('[data-invoice-electric]').textContent = '—';
-    preview.querySelector('[data-invoice-total]').textContent = '—';
-    submitButton.disabled = true;
+    if (meterTable) meterTable.innerHTML = '';
+    if (submitButton) submitButton.disabled = true;
+  };
+
+  const updateDueDate = () => {
+    const match = /^(\d{1,2})\/(\d{4})$/.exec(monthInput.value);
+    if (!dueDateInput) return;
+    if (!match) {
+      dueDateInput.value = '';
+      return;
+    }
+
+    const month = Number(match[1]);
+    let year = Number(match[2]) - 543;
+    const nextMonth = month === 12 ? 1 : month + 1;
+    if (month === 12) year += 1;
+    dueDateInput.value = `${year}-${String(nextMonth).padStart(2, '0')}-01`;
   };
 
   const lookupMeter = async () => {
     lookupController?.abort();
-    if (!contractInput.value || !monthInput.value.trim()) {
-      resetPreview('เลือกห้องและระบุรอบบิลเพื่อดูข้อมูลมิเตอร์');
+    const selectedMonth = monthValue?.value || monthInput.value;
+    if (!selectedMonth.trim()) {
+      resetPreview('เลือกเดือนแล้วกดค้นหาเพื่อดูข้อมูลมิเตอร์ทุกห้อง');
       return;
     }
 
@@ -842,48 +750,59 @@ if (invoiceForm) {
     const status = preview.querySelector('[data-invoice-status]');
     preview.dataset.state = 'loading';
     status.textContent = 'กำลังโหลดข้อมูลห้องและมิเตอร์...';
-    submitButton.disabled = true;
+    if (submitButton) submitButton.disabled = true;
 
-    const url = new URL(invoiceForm.action, window.location.href);
-    url.searchParams.set('page', 'invoice_meter');
-    url.searchParams.set('contractId', contractInput.value);
-    url.searchParams.set('billMonth', monthInput.value.trim());
+    const formAction = invoiceForm.getAttribute('action') || 'index.php';
+    const url = new URL(formAction, window.location.href);
+    url.searchParams.set('page', 'invoice_meter_all');
+    url.searchParams.set('billMonth', selectedMonth.trim());
 
     try {
       const response = await fetch(url, {
         headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
         signal: controller.signal,
       });
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      const responseText = await response.text();
+      let data = {};
+      if (contentType.includes('application/json')) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (_error) {
+          throw new Error('เซิร์ฟเวอร์ส่งข้อมูลไม่ถูกต้อง กรุณาตรวจสอบการเชื่อมต่อ');
+        }
+      } else if (!response.ok) {
+        throw new Error('ไม่สามารถโหลดข้อมูลมิเตอร์ได้ กรุณาเปิดใหม่และลองอีกครั้ง');
+      } else {
+        throw new Error('เซิร์ฟเวอร์ส่งข้อมูลกลับไม่ใช่ JSON');
+      }
       if (!response.ok) throw new Error(data.error || 'โหลดข้อมูลมิเตอร์ไม่สำเร็จ');
       if (lookupController !== controller) return;
-
-      if (data.invoiceExists) {
-        resetPreview(`รอบบิลนี้มีใบแจ้งหนี้ของห้อง ${data.roomNumber} แล้ว`);
-        preview.dataset.state = 'unavailable';
-        return;
-      }
-      if (!data.meterAvailable) {
-        resetPreview(`ไม่พบข้อมูลมิเตอร์ของห้อง ${data.roomNumber} ในรอบบิลนี้`);
-        preview.dataset.state = 'unavailable';
-        return;
-      }
 
       const formatMoney = amount => new Intl.NumberFormat('th-TH', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       }).format(amount) + ' ฿';
-      const waterAmount = Number(data.waterUnit) * Number(data.waterRate);
-      const electricAmount = Number(data.electricUnit) * Number(data.electricRate);
-      const total = Number(data.rentalPrice) + waterAmount + electricAmount;
-
-      preview.querySelector('[data-invoice-rent]').textContent = formatMoney(Number(data.rentalPrice));
-      preview.querySelector('[data-invoice-water]').textContent = `${data.waterUnit} หน่วย · ${formatMoney(waterAmount)}`;
-      preview.querySelector('[data-invoice-electric]').textContent = `${data.electricUnit} หน่วย · ${formatMoney(electricAmount)}`;
-      preview.querySelector('[data-invoice-total]').textContent = formatMoney(total);
-      status.textContent = `ข้อมูลของห้อง ${data.roomNumber} · ${data.name}`;
-      preview.dataset.state = 'ready';
-      submitButton.disabled = false;
+      const rooms = data.rooms || [];
+      const readyRooms = rooms.filter(room => room.contractId && room.meterAvailable && !room.invoiceExists);
+      meterTable.innerHTML = `
+        <table class="invoice-meter-list">
+          <thead><tr><th>ห้อง</th><th>ผู้เช่า</th><th>ค่าเช่า</th><th>น้ำ</th><th>ไฟ</th><th>ยอดรวม</th><th>สถานะ</th></tr></thead>
+          <tbody>${rooms.map(room => {
+            const waterAmount = Number(room.waterUnit || 0) * Number(room.waterRate);
+            const electricAmount = Number(room.electricUnit || 0) * Number(room.electricRate);
+            const total = Number(room.rentalPrice) + waterAmount + electricAmount;
+            let state = 'พร้อมสร้าง';
+            if (room.invoiceExists) state = 'มีใบแจ้งหนี้แล้ว';
+            else if (!room.contractId) state = 'ไม่มีสัญญาเช่าที่ใช้งานอยู่';
+            else if (!room.meterAvailable) state = 'ยังไม่มีมิเตอร์';
+            return `<tr><td><strong>${room.roomNumber}</strong></td><td>${room.name || '—'}</td><td>${formatMoney(Number(room.rentalPrice))}</td><td>${room.meterAvailable ? `${room.waterUnit} หน่วย` : '—'}</td><td>${room.meterAvailable ? `${room.electricUnit} หน่วย` : '—'}</td><td><strong>${room.meterAvailable ? formatMoney(total) : '—'}</strong></td><td>${state}</td></tr>`;
+          }).join('')}</tbody>
+        </table>`;
+      status.textContent = `พบ ${rooms.length} ห้อง · พร้อมสร้าง ${readyRooms.length} ห้อง`;
+      preview.dataset.state = readyRooms.length ? 'ready' : 'unavailable';
+      submitButton.disabled = readyRooms.length === 0;
     } catch (error) {
       if (error.name === 'AbortError' || lookupController !== controller) return;
       resetPreview(error.message || 'โหลดข้อมูลมิเตอร์ไม่สำเร็จ กรุณาลองใหม่');
@@ -891,12 +810,24 @@ if (invoiceForm) {
     }
   };
 
-  contractInput.addEventListener('change', lookupMeter);
-  monthInput.addEventListener('input', lookupMeter);
+  monthInput.addEventListener('change', () => {
+    if (monthValue) monthValue.value = monthInput.value;
+    updateDueDate();
+    lookupMeter();
+  });
+  monthSearch.addEventListener('click', () => {
+    if (monthValue) monthValue.value = monthInput.value;
+    updateDueDate();
+    lookupMeter();
+  });
   invoiceForm.addEventListener('submit', event => {
     if (preview.dataset.state !== 'ready') {
       event.preventDefault();
       preview.querySelector('[data-invoice-status]').textContent = 'เลือกห้องที่มีข้อมูลมิเตอร์ของรอบบิลก่อนสร้างใบแจ้งหนี้';
     }
   });
+  if (monthInput.value) {
+    updateDueDate();
+    lookupMeter();
+  }
 }
